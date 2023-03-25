@@ -1,5 +1,5 @@
 pyvenv.cfg
-#workspace.xml
+workspace.xml
 Lib
 include
 Scripts
