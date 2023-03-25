@@ -1,0 +1,10 @@
+sqlalchemy
+alembic
+aiomysql
+# pymysql
+python-dotenv
+fastapi[all]
+mysql
+mysql-connector-python
+fastapi-users[sqlalchemy]
+pydantic

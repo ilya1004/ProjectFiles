@@ -1,0 +1,7 @@
+pyvenv.cfg
+#workspace.xml
+Lib
+include
+Scripts
+__pycache__
+authentication/__pycache__

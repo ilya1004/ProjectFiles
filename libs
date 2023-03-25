@@ -1,0 +1,18 @@
+Libs for python:
+
+sqlalchemy
+alembic
+aiomysql
+pymysql  ? (не используется)
+python-dotenv
+fastapi[all]
+mysql
+mysql-connector-python
+fastapi-users[sqlalchemy]
+pydantic
+
+
+Libs for docker:
+python:3.10-alpine
+mysql:8.0
+ubuntu:latest (22.04)

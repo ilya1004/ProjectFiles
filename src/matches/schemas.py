@@ -1,0 +1,19 @@
+from datetime import datetime
+from pydantic import BaseModel
+
+
+class MatchCreate(BaseModel):
+    id: int
+    mode_id: int
+    played_at: datetime
+    game_length_sec: int
+    player_1_id: int
+    player_2_id: int
+    rate_change_1: int
+    rate_change_2: int
+
+
+class ModeCreate(BaseModel):
+    id: int
+    name: str
+    mode_length_sec: int
