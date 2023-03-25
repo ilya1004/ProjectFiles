@@ -1,5 +1,13 @@
-from datetime import datetime
+# from datetime import datetime
+
 from pydantic import BaseModel
+from pydantic.schema import datetime
+
+
+class ModeCreate(BaseModel):
+    id: int
+    name: str
+    mode_length_sec: int
 
 
 class MatchCreate(BaseModel):
@@ -11,9 +19,3 @@ class MatchCreate(BaseModel):
     player_2_id: int
     rate_change_1: int
     rate_change_2: int
-
-
-class ModeCreate(BaseModel):
-    id: int
-    name: str
-    mode_length_sec: int

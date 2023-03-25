@@ -39,7 +39,7 @@ class Mode(Base):
 class Match(Base):
     __tablename__ = 'match'
     id = Column(Integer, primary_key=True)
-    mode_id = Column(Integer, ForeignKey('mode.id'), nullable=False)
+    mode_id = Column(Integer, ForeignKey(mode.c.id), nullable=False)
     played_at = Column(TIMESTAMP, default=datetime.utcnow)
     game_length_sec = Column(Integer, nullable=False)
     player_1_id = Column(Integer, nullable=False)

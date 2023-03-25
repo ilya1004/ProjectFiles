@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, insert, Row
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.encoders import jsonable_encoder
 
 from src.database import get_async_session
 from src.matches.models import match, mode
-from src.matches.schemas import MatchCreate
+from src.matches.schemas import MatchCreate, ModeCreate
 
 router = APIRouter(
     prefix="/matches",
@@ -21,15 +20,24 @@ async def get_matches(user_id: int, session: AsyncSession = Depends(get_async_se
     return result.all()
 
 
-def row2dict(row: Row) -> dict:
-    """Преобразует объект типа Row в словарь"""
-    return {col: getattr(row, col) for col in row.__table__.columns.keys()}
-
 @router.get('/get_all_matches')
 async def get_all_matches(session: AsyncSession = Depends(get_async_session)):
     query = select(match)
     result = await session.execute(query)
-    return jsonable_encoder([row2dict(row) for row in result.all()])
+    lst = ["id", "mode_id", "played_at", "game_length_sec",
+           "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
+    list_res = list()
+    for tup in result:
+        list_res.append(dict(zip(lst, tup)))
+    # print(list_res)
+    return list_res
+
+
+@router.get('/get_all_modes')
+async def get_all_modes(session: AsyncSession = Depends(get_async_session)):
+    query = select(mode)
+    result = await session.execute(query)
+    return result.all()
 
 
 @router.post('/')
