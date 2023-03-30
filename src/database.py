@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.dialects import *
 
 from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
 
