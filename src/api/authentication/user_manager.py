@@ -1,8 +1,8 @@
 from typing import Optional
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin
-from src.authentication.models import User
-from src.authentication.utils import get_user_db
+from src.api.authentication.models import User
+from src.api.authentication.utils import get_user_db
 from src.config import SECRET_AUTH
 
 SECRET = SECRET_AUTH

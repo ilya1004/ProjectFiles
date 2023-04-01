@@ -3,8 +3,8 @@ from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
-from src.matches.models import match, mode
-from src.matches.schemas import MatchCreate, ModeCreate
+from src.api.matches.models import match, mode
+from src.api.matches.schemas import MatchCreate
 
 router = APIRouter(
     prefix="/matches",

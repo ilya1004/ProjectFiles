@@ -1,10 +1,8 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import FastAPI, Depends
-from src.authentication.base_config import auth_backend, fastapi_users, current_user
-from src.authentication.models import User
-from src.authentication.schemas import UserRead, UserCreate
-from src.database import get_async_session
-from src.matches.router import router as router_matches
+from src.api.authentication.base_config import auth_backend, fastapi_users, current_user
+from src.api.authentication.models import User
+from src.api.authentication.schemas import UserRead, UserCreate
+from src.api.matches.router import router as router_matches
 
 app = FastAPI(
     title="Сайт для секса"

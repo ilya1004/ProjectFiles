@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход на сайт для секса с аниме-тян</title>
+</head>
+<body>
+    <h1>Максим иди работай</h1>
+    <form id="main-form" onsubmit="return checkForm(this)" method="post">
+        <label for="name">Имя</label>
+        <input type="text" name="name" placeholder="Имя" id="name"><br><br>
+        <label for="password">Пароль</label>
+        <input type="password" name="pass" placeholder="Пароль" id="password"><br><br>
+        <label for="repass">Проверка пароля</label>
+        <input type="password" name="repass" placeholder="Проверка пароля" id="repass"><br><br>
+        <span>Пол:</span>
+        <label for="male">Мужской пол</label>
+        <input type="radio" name="state" id="male" value="Мужской">
+        <label for="female">Женский пол</label>
+        <input type="radio" name="state" id="female" value="Женский"><br><br>
+
+        <label for="isdoter">Вы дотер?</label>
+        <input type="checkbox" name="isdoter" id="isdoter"><br><br>
+
+        <input type="submit" name="submit" value="Готово">
+        <input type="reset" name="reset" value="Очистить">
+    </form>
+
+    <script src="/src/static/js/signin.js"></script>
+</body>
+</html>

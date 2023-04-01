@@ -4,8 +4,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
-from src.authentication.models import metadata as metadata_auth
-from src.matches.models import metadata as metadata_matches
+from src.api.authentication.models import metadata as metadata_auth
+from src.api.matches.models import metadata as metadata_matches
 
 import os
 import sys
