@@ -11,8 +11,13 @@ mysql-connector-python
 fastapi-users[sqlalchemy]
 pydantic
 
+Libs for javascript:
+
+axios
+
 
 Libs for docker:
+
 python:3.10-alpine
 mysql:8.0
 ubuntu:latest (22.04)

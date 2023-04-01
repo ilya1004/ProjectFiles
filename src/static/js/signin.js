@@ -1,12 +1,23 @@
-function checkForm(el) {
+function checkString(str) {
+    let isValid = true;
+    var regex = /^[a-zA-Z0-9_.!?<>-]+$/;   // Допустимые символы для строки
+    if (str.length > 50 || !regex.test(str)) {
+        isValid = false;
+    }
+    return isValid;
+}
 
-    var name = el.name.value;
+function checkEnterForm(el) {
+    var login = el.login.value;
     var password = el.password.value;
-    var repass = el.repass.value;
-    var state = el.state.value;
-    var isdoter = el.isdoter.value;
 
-    console.log(name + '\n' + password + '\n' + repass + '\n' + state + '\n' + isdoter);
+    var isValid = true;
 
-    return false;
+    if (!checkString(login) || !checkString(password)) {
+        isValid = false;
+    }
+
+    console.log(login + '\n' + password);
+
+    return isValid;
 }

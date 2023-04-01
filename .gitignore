@@ -4,4 +4,5 @@ Lib
 include
 Scripts
 __pycache__
+node_modules
 authentication/__pycache__
