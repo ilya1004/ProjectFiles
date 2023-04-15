@@ -17,5 +17,5 @@ class MatchCreate(BaseModel):
     game_length_sec: int
     player_1_id: int
     player_2_id: int
-    rate_change_1: int
-    rate_change_2: int
+    rate_change_player_1: int
+    rate_change_player_2: int

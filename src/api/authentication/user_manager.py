@@ -16,10 +16,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         print(f"User {user.id} has registered.")
 
     async def on_after_verify(self, user: User, request: Optional[Request] = None):
-        return f"User {user.nickname} has verified"
+        print(f"User {user.nickname} has verified")
 
     async def on_after_login(self, user: User, request: Optional[Request] = None):
-        return f"User {user.nickname} login successfully"
+        print(f"User {user.nickname} login successfully")
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):

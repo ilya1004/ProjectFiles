@@ -3,6 +3,8 @@ from src.api.authentication.base_config import auth_backend, fastapi_users, curr
 from src.api.authentication.models import User
 from src.api.authentication.schemas import UserRead, UserCreate
 from src.api.matches.router import router as router_matches
+from src.api.authentication.router import router as router_user
+from src.game_engine.game_manager import router as router_game_engine
 
 app = FastAPI(
     title="Сайт для секса"
@@ -22,10 +24,6 @@ app.include_router(
     tags=["Auth"],
 )
 
-
-@app.post('/auth', tags=["Auth"])
-def get_current_user(user: User = Depends(current_user)):
-    return f"Hello, {user.nickname}"
-
+app.include_router(router_user)
 
 app.include_router(router_matches)
