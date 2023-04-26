@@ -25,5 +25,5 @@ app.include_router(
 )
 
 app.include_router(router_user)
-
 app.include_router(router_matches)
+app.include_router(router_game_engine)

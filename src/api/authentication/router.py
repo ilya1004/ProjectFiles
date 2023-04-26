@@ -33,7 +33,7 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
     return dict_res
 
 
-@router.post("/get_info_by_user_id")  # Доделать
+@router.post("/get_info_by_user_id")
 async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     query = select(user).where(user.c.id == user_id)
     result = await session.execute(query)
