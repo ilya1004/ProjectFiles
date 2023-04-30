@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from fastapi import WebSocket, APIRouter, WebSocketDisconnect, Depends
 
 from src.api.authentication.base_config import current_user
+from src.game_engine.router import update_user_rate
 from src.game_engine.chess_logic import Game
+from src.api.matches.router import add_match
 
 router = APIRouter(
     prefix="/game_engine",
@@ -106,6 +110,22 @@ class ConnectionManager:
                         self.queue_blitz_2.remove(curr_user)
 
     @staticmethod
+    async def add_match_to_db(mode_id, game_length, player_winner, player_loser, rate_change_1, rate_change_2):
+        # MatchCreate(mode_id=mode_id, game_length_sec=game_length, player_1_id=player_winner, player_2_id=player_loser,
+        #             rate_change_player_1=rate_change_1, rate_change_player_2=rate_change_2)
+        match_dict = {
+            "id": 0,
+            "mode_id": mode_id,
+            "played_at": datetime.utcnow(),
+            "game_length_sec": game_length,
+            "player_1_id": player_winner,
+            "player_2_id": player_loser,
+            "rate_change_player_1": rate_change_1,
+            "rate_change_player_2": rate_change_2
+        }
+        await add_match(match_dict)
+
+    @staticmethod
     def rate_compare(player: Player):
         return player.rate_blitz
 
@@ -122,6 +142,28 @@ class ConnectionManager:
             if game.player1 == websocket or game.player2 == websocket:
                 return game
         return None
+
+    def count_rate_change(self, mode_id: int, player_winner: Player, player_loser: Player) -> (int, int):
+        # изменение рейтинга победителя, рейтинга проигравшего
+        if mode_id in (0, 1, 2):
+            return 25, -25
+        elif mode_id in (3, 4, 5):
+            return 25, -25
+        elif mode_id in (6, 7, 8):
+            return 25, -25
+
+    @staticmethod
+    async def update_users_rate_in_db(mode_id: int, player_winner: Player, player_loser: Player,
+                                      rate_change_1: int, rate_change_2: int):
+        if mode_id in (0, 1, 2):
+            await update_user_rate(player_winner.player_id, "blitz", rate_change_1)
+            await update_user_rate(player_loser.player_id, "blitz", rate_change_2)
+        elif mode_id in (3, 4, 5):
+            await update_user_rate(player_winner.player_id, "rapid", rate_change_1)
+            await update_user_rate(player_loser.player_id, "rapid", rate_change_2)
+        elif mode_id in (3, 4, 5):
+            await update_user_rate(player_winner.player_id, "classical", rate_change_1)
+            await update_user_rate(player_loser.player_id, "classical", rate_change_2)
 
 
 manager = ConnectionManager()
@@ -143,6 +185,8 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
         player1, player2 = manager.find_new_game(mode_id)
         if player1 is not None and player2 is not None:
             game = Game(player1, player2)
+            manager.remove_from_queues(mode_id, player1)
+            manager.remove_from_queues(mode_id, player2)
             manager.add_game_to_list(game)
 
             await manager.send_personal_message(player1, "game_is_starting")
@@ -150,15 +194,42 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
 
             await player1.send_game(game)
             await player2.send_game(game)
+            time_start = datetime.utcnow()
+
+            player_winner, player_loser = None, None
 
             while True:
                 request_json = await manager.get_json(websocket)
                 if request_json["operation"] == "make_a_move":
                     game = manager.find_curr_game(player.websocket)
                     game.make_a_move(request_json)
+                    if game.is_game_end():
+                        player_winner = game.get_winner()
+                        player_loser = game.get_loser()
+                        break
                     await game.player1.send_game_state(game.to_json())
                     await game.player2.send_game_state(game.to_json())
-
+                elif request_json['operation'] == "surrender":
+                    game = manager.find_curr_game(player.websocket)
+                    if game.player1 == player:
+                        await manager.send_personal_message(player1, "you_lose")
+                        await manager.send_personal_message(player2, "you_win")
+                        player_winner = player2
+                        player_loser = player1
+                        break
+                    elif game.player2 == player:
+                        await manager.send_personal_message(player1, "you_win")
+                        await manager.send_personal_message(player2, "you_lose")
+                        player_winner = player1
+                        player_loser = player2
+                        break
+            time_end = datetime.utcnow()
+            time_length = time_end - time_start
+            game_length = time_length.seconds
+            rate_change_1, rate_change_2 = manager.count_rate_change(mode_id, player_winner, player_loser)
+            await manager.update_users_rate_in_db(mode_id, player_winner, player_loser, rate_change_1, rate_change_2)
+            await manager.add_match_to_db(mode_id, game_length, player_winner, player_loser, rate_change_1, rate_change_2)
+            # добавление игры в бд и изменение рейтинга игроков
 
 
     except WebSocketDisconnect:
@@ -167,9 +238,9 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
         await manager.broadcast(f"Client #{user.id} disconnected")
 
 
-@router.post("/leave_queue")
-def leave_queue(mode_id: int, user=Depends(current_user)):
-    manager.remove_from_queues(mode_id, user)
+# @router.post("/leave_queue")
+# def leave_queue(mode_id: int, user=Depends(current_user)):
+#     manager.remove_from_queues(mode_id, user)
 
 
 '''

@@ -15,6 +15,18 @@ class Game:
         # Обновление состояния игры на основе хода игрока
         pass
 
+    def is_game_end(self):
+        # возвращает True если последний ход привел к завершению партии
+        pass
+
+    def get_winner(self):
+        # возвращает объект Player того кто выйграл
+        pass
+
+    def get_loser(self):
+        # возвращает объект Player того кто проиграл
+        pass
+
     def to_json(self):
         # Преобразование объекта игры в JSON
         pass

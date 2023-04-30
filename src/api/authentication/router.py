@@ -37,7 +37,7 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
 async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     query = select(user).where(user.c.id == user_id)
     result = await session.execute(query)
-    print(result)
+    # print(result)
     lst = ["id", "email", "hashed_password", "nickname", "registration_time", "is_active", "is_superuser", "is_verified",
            "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
            "rate_blitz", "rate_rapid", "rate_classical"]
