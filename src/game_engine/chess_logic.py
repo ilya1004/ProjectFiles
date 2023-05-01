@@ -11,8 +11,7 @@ class Game:
         self.player2 = player2
         # Инициализация шахматной доски и других параметров игры
 
-    async def update(self, request):
-        # Обновление состояния игры на основе хода игрока
+    def make_a_move(self, request: dict):
         pass
 
     def is_game_end(self):

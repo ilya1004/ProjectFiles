@@ -4,7 +4,7 @@ from src.api.authentication.models import User
 from src.api.authentication.schemas import UserRead, UserCreate
 from src.api.matches.router import router as router_matches
 from src.api.authentication.router import router as router_user
-from src.game_engine.game_manager import router as router_game_engine
+from src.game_engine.router import router as router_game_engine
 
 app = FastAPI(
     title="Сайт для секса"
