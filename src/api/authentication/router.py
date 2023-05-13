@@ -1,24 +1,25 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from src.api.authentication.base_config import current_user
 from src.api.authentication.models import User, user
 from src.database import get_async_session
 from src.api.authentication.utils import ExceptionUnauthorized
 from src.api.authentication.utils import ExceptionNoUser
 
+
 router = APIRouter(
-    prefix="/auth",
-    tags=["Auth"]
+    prefix="/user",
+    tags=["User"]
 )
 
 
-@router.post('/is_user_in_database_by_id')
+@router.get('/is_user_in_database_by_id')
 async def is_user_in_database_by_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     try:
         if not type(user_id) is int:
             raise TypeError("Error")
-        query = select(user).where(user.c.id == user_id)
+        query = select(user.c.id).where(user.c.id == user_id)
         result = await session.execute(query)
         if len(result.all()) == 1:
             is_user_res = 1
@@ -43,33 +44,7 @@ async def is_user_in_database_by_id(user_id: int, session: AsyncSession = Depend
         }
 
 
-
-@router.post('/get_current_user')
-def get_current_user(curr_user: User = Depends(current_user)):
-    try:
-        if type(curr_user) is int and curr_user == 401:
-            raise ExceptionUnauthorized("Error")
-        return {
-            "status": "success",
-            "data": f"Hello, {curr_user.nickname}",
-            "details": None
-        }
-
-    except ExceptionUnauthorized:
-        return {
-            "status": "error",
-            "data": "ExceptionUnauthorized",
-            "details": "User is unauthorized"
-        }
-    except Exception:
-        return {
-            "status": "error",
-            "data": "Exception",
-            "details": "Unknown error"
-        }
-
-
-@router.post('/get_info_of_current_user')
+@router.get('/get_info_of_current_user')
 def get_info_of_current_user(curr_user: User = Depends(current_user)):
     try:
         if type(curr_user) is int and curr_user == 401:
@@ -78,7 +53,7 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
         lst = ["id", "nickname", "registration_time", "number_matches_blitz", "number_matches_rapid",
                "number_matches_classical", "rate_blitz", "rate_rapid", "rate_classical"]
         dict_res = dict()
-        dict_res[lst[0]] = curr_user.id_
+        dict_res[lst[0]] = curr_user.id
         dict_res[lst[1]] = curr_user.nickname
         dict_res[lst[2]] = curr_user.registration_time
         dict_res[lst[3]] = curr_user.number_matches_blitz
@@ -92,7 +67,6 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
             "data": dict_res,
             "details": None
         }
-
     except ExceptionUnauthorized:
         return {
             "status": "error",
@@ -107,21 +81,21 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
         }
 
 
-@router.post("/get_info_by_user_id")
+@router.get("/get_info_by_user_id")
 async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     try:
         if not type(user_id) is int:
             raise TypeError("Error")
-        query = select(user).where(user.c.id == user_id)
+        query = select(user.c.id, user.c.nickname, user.c.registration_time,
+                       user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
+                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical).where(user.c.id == user_id)
         result = await session.execute(query)
-        if len(result.all()) == 0:
-            raise ExceptionNoUser("Error")
-        lst = ["id", "email", "hashed_password", "nickname", "registration_time", "is_active", "is_superuser", "is_verified",
+        lst = ["id", "nickname", "registration_time",
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
                "rate_blitz", "rate_rapid", "rate_classical"]
-        list_res = list()
-        for tup in result:
-            list_res.append(dict(zip(lst, tup)))
+        list_res = [dict(zip(lst, row)) for row in result.all()]
+        if len(list_res) == 0:
+            raise ExceptionNoUser("Error")
         return {
             "status": "success",
             "data": list_res[0],
@@ -145,3 +119,20 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
             "data": "Exception",
             "details": "Unknown error"
         }
+
+
+@router.get("/get_info_of_all_users")
+async def get_info_of_all_users(session: AsyncSession = Depends(get_async_session)):
+    query = select(user.c.id, user.c.nickname,
+                   user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
+                   user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical)
+    result = await session.execute(query)
+    lst = ["id", "nickname",
+           "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
+           "rate_blitz", "rate_rapid", "rate_classical"]
+    list_res = [dict(zip(lst, row)) for row in result.all()]
+    return {
+        "status": "success",
+        "data": list_res,
+        "details": None
+    }

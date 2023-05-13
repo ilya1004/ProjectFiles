@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Depends
-from src.api.authentication.base_config import auth_backend, fastapi_users, current_user
-from src.api.authentication.models import User
+from fastapi import FastAPI
+from src.api.authentication.base_config import auth_backend, fastapi_users
 from src.api.authentication.schemas import UserRead, UserCreate
 from src.api.matches.router import router as router_matches
 from src.api.authentication.router import router as router_user

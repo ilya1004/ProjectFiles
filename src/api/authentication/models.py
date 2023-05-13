@@ -27,13 +27,13 @@ user = Table(
 
 class User(SQLAlchemyBaseUserTable[int], Base):
     id: int = Column(Integer, primary_key=True)
-    email: str = Column(String(100), nullable=False)
-    hashed_password: str = Column(String(length=1024), nullable=False)
     nickname: str = Column(String(100), nullable=False)
     registration_time: TIMESTAMP = Column(TIMESTAMP, default=datetime.utcnow)
+    hashed_password: str = Column(String(length=1024), nullable=False)
     is_active: bool = Column(Boolean, default=True, nullable=False)
     is_superuser: bool = Column(Boolean, default=False, nullable=False)
     is_verified: bool = Column(Boolean, default=False, nullable=False)
+    email: str = Column(String(100), nullable=False)
     number_matches_blitz: int = Column(Integer, default=0, nullable=False)
     number_matches_rapid: int = Column(Integer, default=0, nullable=False)
     number_matches_classical: int = Column(Integer, default=0, nullable=False)

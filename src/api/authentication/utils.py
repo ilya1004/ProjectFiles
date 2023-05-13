@@ -19,8 +19,3 @@ class ExceptionUnauthorized(Exception):
 class ExceptionNoUser(Exception):
     def __init__(self, message: str):
         self.message = message
-
-
-# class ExceptionNoMatches(Exception):
-#     def __init__(self, message: str):
-#         self.message = message

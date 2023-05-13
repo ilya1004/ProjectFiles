@@ -15,9 +15,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
 
-    async def on_after_verify(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.nickname} has verified")
-
     async def on_after_login(self, user: User, request: Optional[Request] = None):
         print(f"User {user.nickname} login successfully")
 

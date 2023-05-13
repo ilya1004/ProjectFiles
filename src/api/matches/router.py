@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
+from fastapi import APIRouter, Depends
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.authentication.base_config import current_user
@@ -8,7 +8,7 @@ from src.api.authentication.models import User
 from src.api.authentication.utils import ExceptionUnauthorized, ExceptionNoUser
 from src.database import get_async_session
 from src.api.matches.models import match, mode
-from src.api.matches.schemas import MatchCreate, ModeCreate
+from src.api.matches.schemas import ModeCreate
 from src.api.authentication.router import is_user_in_database_by_id
 
 router = APIRouter(
@@ -41,9 +41,7 @@ async def get_matches_by_user_id(user_id: int, number_of_matches: int = -1, offs
         result = await session.execute(query)
         lst = ["id", "mode_id", "played_at", "game_length_sec",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
-        list_res = list()
-        for tup in result:
-            list_res.append(dict(zip(lst, tup)))
+        list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
             "status": "success",
             "data": list_res,
@@ -106,9 +104,7 @@ async def get_matches_of_current_user(number_of_matches: int = -1, offset: int =
         result = await session.execute(query)
         lst = ["id", "mode_id", "played_at", "game_length_sec",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
-        list_res = list()
-        for tup in result:
-            list_res.append(dict(zip(lst, tup)))
+        list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
             "status": "success",
             "data": list_res,
@@ -164,9 +160,7 @@ async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
         result = await session.execute(query)
         lst = ["id", "mode_id", "played_at", "game_length_sec",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
-        list_res = list()
-        for tup in result:
-            list_res.append(dict(zip(lst, tup)))
+        list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
             "status": "success",
             "data": list_res,
@@ -198,9 +192,7 @@ async def get_all_modes(session: AsyncSession = Depends(get_async_session)):
         query = select(mode)
         result = await session.execute(query)
         lst = ["id", "name", "mode_length_sec"]
-        list_res = list()
-        for tup in result:
-            list_res.append(dict(zip(lst, tup)))
+        list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
             "status": "success",
             "data": list_res,
@@ -211,60 +203,6 @@ async def get_all_modes(session: AsyncSession = Depends(get_async_session)):
             "status": "error",
             "data": "SQLAlchemyError",
             "details": f"Database error: {str(e)}"
-        }
-    except Exception:
-        return {
-            "status": "error",
-            "data": "Exception",
-            "details": "Unknown error"
-        }
-
-
-@router.post('/add_new_match')
-async def add_new_match(mode_id: int, played_at: datetime, game_length: int, player_winner_id: int,
-                        player_loser_id: int, rate_change_1: int, rate_change_2: int,
-                        session: AsyncSession = Depends(get_async_session)):
-    try:
-        if not isinstance(mode_id, int):
-            raise TypeError("Mode ID should be int")
-        if not isinstance(played_at, datetime):
-            raise TypeError("Played_at should be datetime")
-        if not isinstance(game_length, int):
-            raise TypeError("Game length should be int")
-        if not isinstance(player_winner_id, int) or not isinstance(player_loser_id, int):
-            raise TypeError("Player ID should be int")
-        if not isinstance(rate_change_1, int) or not isinstance(rate_change_2, int):
-            raise TypeError("Rate_change should be int")
-
-        new_match = {
-            "id": 0,
-            "mode_id": mode_id,
-            "played_at": played_at,
-            "game_length_sec": game_length,
-            "player_1_id": player_winner_id,
-            "player_2_id": player_loser_id,
-            "rate_change_player_1": rate_change_1,
-            "rate_change_player_2": rate_change_2
-        }
-        stmt = insert(match).values(**new_match)
-        await session.execute(stmt)
-        await session.commit()
-        return {
-            "status": "success",
-            "data": new_match,
-            "details": None
-        }
-    except SQLAlchemyError as e:
-        return {
-            "status": "error",
-            "data": "SQLAlchemyError",
-            "details": f"Database error: {str(e)}"
-        }
-    except TypeError as e:
-        return {
-            "status": "error",
-            "data": "TypeError",
-            "details": str(e)
         }
     except Exception:
         return {
