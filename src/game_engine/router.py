@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, insert
+from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.authentication.models import user
 from src.api.matches.models import match

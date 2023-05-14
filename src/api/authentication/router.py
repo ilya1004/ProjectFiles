@@ -1,11 +1,11 @@
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
 from src.api.authentication.base_config import current_user
 from src.api.authentication.models import User, user
 from src.database import get_async_session
-from src.api.authentication.utils import ExceptionUnauthorized
-from src.api.authentication.utils import ExceptionNoUser
+from src.custom_errors import ExceptionUnauthorized, ExceptionNoUser
 
 
 router = APIRouter(
@@ -73,6 +73,12 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
             "data": "ExceptionUnauthorized",
             "details": "User is unauthorized"
         }
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
     except Exception:
         return {
             "status": "error",
@@ -107,6 +113,12 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
             "data": "ExceptionNoUser",
             "details": f"No user in database with given id"
         }
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
     except TypeError:
         return {
             "status": "error",
@@ -123,16 +135,29 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
 
 @router.get("/get_info_of_all_users")
 async def get_info_of_all_users(session: AsyncSession = Depends(get_async_session)):
-    query = select(user.c.id, user.c.nickname,
-                   user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
-                   user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical)
-    result = await session.execute(query)
-    lst = ["id", "nickname",
-           "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
-           "rate_blitz", "rate_rapid", "rate_classical"]
-    list_res = [dict(zip(lst, row)) for row in result.all()]
-    return {
-        "status": "success",
-        "data": list_res,
-        "details": None
-    }
+    try:
+        query = select(user.c.id, user.c.nickname,
+                       user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
+                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical)
+        result = await session.execute(query)
+        lst = ["id", "nickname",
+               "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
+               "rate_blitz", "rate_rapid", "rate_classical"]
+        list_res = [dict(zip(lst, row)) for row in result.all()]
+        return {
+            "status": "success",
+            "data": list_res,
+            "details": None
+        }
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
+    except Exception:
+        return {
+            "status": "error",
+            "data": "Exception",
+            "details": "Unknown error"
+        }

@@ -16,19 +16,19 @@ router = APIRouter(
 manager = ConnectionManager()
 
 
-@router.websocket("/add_to_queue/{mode_id}")
-async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_user)):
-    # game = None
+@router.websocket("/add_to_queue_ws/{mode_id}")
+async def add_to_queue_ws(websocket: WebSocket, mode_id: int, user=Depends(current_user)):
     try:
         if not isinstance(mode_id, int):
             raise TypeError("Mode ID should be int")
-        if mode_id not in (range(0, 8)):
-            raise ValueError("Mode ID should be in (range(0, 8))")
-        await manager.connect_user(websocket)
+        if mode_id not in range(0, 19):
+            raise ValueError("Mode ID should be in range(0, 19)")
+
         if mode_id in range(0, 8):
             is_rate = True
         else:
             is_rate = False
+        await manager.connect_user(websocket)
         player = Player(websocket, user.id, user.rate_blitz, user.rate_rapid, user.rate_classical, mode_id, is_rate)
         manager.add_player_to_queue(player)
         player1, player2 = manager.find_new_game(mode_id)
@@ -44,9 +44,16 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
             await game.player1.send_game_state(game.to_json())
             await game.player2.send_game_state(game.to_json())
             while True:
-                request_json = await player.get_json()
+                request_json = None
+                if game.get_id_player_to_move() == 1:
+                    request_json = await player1.get_json()
+                elif game.get_id_player_to_move() == 2:
+                    request_json = await player2.get_json()
                 if request_json["operation"] == "make_a_move":
-                    game = manager.find_curr_game(player)
+                    if request_json["number_player"] == 1:
+                        game = manager.find_curr_game(player1)
+                    elif request_json["number_player"] == 2:
+                        game = manager.find_curr_game(player2)
                     game.make_a_move(request_json)
                     if game.is_game_end():
                         player_winner = game.get_winner()
@@ -57,14 +64,17 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
                     await game.player1.send_game_state(game.to_json())
                     await game.player2.send_game_state(game.to_json())
                 elif request_json['operation'] == "surrender" or request_json['operation'] == "time_over":
-                    game = manager.find_curr_game(player)
-                    if game.player1 == player:
+                    if request_json["number_player"] == 1:
+                        game = manager.find_curr_game(player1)
+                    elif request_json["number_player"] == 2:
+                        game = manager.find_curr_game(player2)
+                    if request_json["number_player"] == 1:
                         await player1.send_message("you_lose")
                         await player2.send_message("you_win")
                         player_winner = player2
                         player_loser = player1
                         break
-                    elif game.player2 == player:
+                    elif request_json["number_player"] == 2:
                         await player1.send_message("you_win")
                         await player2.send_message("you_lose")
                         player_winner = player1
@@ -86,10 +96,15 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
             await manager.disconnect_user(player1)
             await manager.disconnect_user(player2)
 
-    except WebSocketDisconnect:
+    except WebSocketDisconnect as e:
         await manager.disconnect_user(websocket)
         manager.remove_player_from_queues(user)
         manager.clear_ended_games()
+        return {
+            "status": "error",
+            "data": "WebSocketDisconnect",
+            "details": str(e)
+        }
     except SQLAlchemyError as e:
         return {
             "status": "error",
@@ -114,3 +129,20 @@ async def add_to_queue(websocket: WebSocket, mode_id: int, user=Depends(current_
             "data": "Exception",
             "details": "Unknown error"
         }
+
+'''
+JSON файлы для партии:
+
+{
+    "operation": "make_a_move",
+    "number_player": 1/2
+    "data": "какая-то информация для выполнения хода"    
+}
+
+{
+    "operation": "surrender"/"time_over",
+    "number_player": 1/2
+    "data": None    
+}
+
+'''

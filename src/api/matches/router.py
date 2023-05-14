@@ -5,7 +5,7 @@ from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.authentication.base_config import current_user
 from src.api.authentication.models import User
-from src.api.authentication.utils import ExceptionUnauthorized, ExceptionNoUser
+from src.custom_errors import ExceptionUnauthorized, ExceptionNoUser
 from src.database import get_async_session
 from src.api.matches.models import match, mode
 from src.api.matches.schemas import ModeCreate

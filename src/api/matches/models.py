@@ -1,10 +1,7 @@
 from datetime import datetime
-from sqlalchemy import Table, MetaData, Column, Integer, String, TIMESTAMP, ForeignKey
-
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey
 from src.api.authentication.models import user
-from src.database import Base
-
-metadata = MetaData()
+from src.database import metadata
 
 mode = Table(
     'mode',

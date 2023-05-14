@@ -32,3 +32,7 @@ class Game:
     def to_json(self):
         # Преобразование объекта игры в JSON (словарь)
         pass
+
+    def get_id_player_to_move(self):
+        # Вовзращает 1 или 2 в зависимости от того, чей ход (1го игрока или 2го)
+        pass
