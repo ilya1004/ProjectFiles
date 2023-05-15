@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.game_engine.chess_logic import Game
+from src.game_engine.chess_engine import Game
 from src.game_engine.player import Player
 from src.game_engine.router import update_user_rate, add_new_match
 from fastapi import WebSocket

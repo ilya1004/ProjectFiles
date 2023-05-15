@@ -1,10 +1,14 @@
-from fastapi_users import FastAPIUsers
+from typing import Union
+
+from fastapi_users import FastAPIUsers, schemas, models
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
 from src.api.authentication.models import User
 from src.api.authentication.user_manager import get_user_manager
 from src.config import SECRET_AUTH
+from fastapi_users.manager import BaseUserManager
+
 
 cookie_transport = CookieTransport(cookie_name="cookie", cookie_max_age=3600)
 

@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import WebSocket, APIRouter, WebSocketDisconnect, Depends
 from src.api.authentication.base_config import current_user
-from src.game_engine.chess_logic import Game
+from src.game_engine.chess_engine import Game
 from src.game_engine.connection_manager import ConnectionManager
 from src.game_engine.player import Player
 

@@ -1,5 +1,5 @@
 from sqlalchemy import select, delete
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
 from src.api.authentication.base_config import current_user
@@ -123,6 +123,12 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
         return {
             "status": "error",
             "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
+    except OperationalError as e:
+        return {
+            "status": "error",
+            "data": "OperationalError",
             "details": f"Database error: {str(e)}"
         }
     except TypeError:

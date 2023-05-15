@@ -16,23 +16,18 @@ class Game:
 
     def make_a_move(self, request: dict):
         pass
-
     def is_game_end(self):
         # возвращает True если последний ход привел к завершению партии
         pass
-
     def get_winner(self):
         # возвращает объект Player того кто выйграл
         pass
-
     def get_loser(self):
         # возвращает объект Player того кто проиграл
         pass
-
     def to_json(self):
         # Преобразование объекта игры в JSON (словарь)
         pass
-
     def get_id_player_to_move(self):
         # Вовзращает 1 или 2 в зависимости от того, чей ход (1го игрока или 2го)
         pass
