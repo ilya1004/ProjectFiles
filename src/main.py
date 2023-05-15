@@ -4,9 +4,25 @@ from src.api.authentication.schemas import UserRead, UserCreate
 from src.api.matches.router import router as router_matches
 from src.api.authentication.router import router as router_user
 from src.game_engine.router import router as router_game_engine
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(
     title="Сайт для секса"
+)
+
+
+origins = ["http://localhost",
+           "http://localhost:3000",
+           "http://localhost:8080"]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
