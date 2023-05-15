@@ -1,0 +1,92 @@
+.game {
+    padding: 2vh;
+}
+
+.avanickrate{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 60vh;
+    height: 8vh;
+    border-width: 2px;
+    border-color: salmon;
+    border-style: solid;
+}
+
+.avanickrate div {
+    align-self: center;
+    margin: auto;
+    
+}
+
+.gamepage {
+    flex: 1;
+    display: flex;
+}
+
+.game_info{
+    flex: 1;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 95vh;
+}
+
+.game_info h2 {
+    text-align: center;
+    margin: 5vh;
+    height: 10vh;
+}
+
+.turntimebox {
+    display:flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 50%;
+}
+
+.turntimebox h3 {
+    margin: auto;
+    align-self: flex-start;
+    text-align: center;
+}
+
+.turntimebox div {
+    margin: auto;
+    align-self: flex-start;
+}
+
+.timer {
+    text-align: center;
+    width: 20vh;
+    margin: auto;
+    border-style: solid;
+    border-width: 2px;
+    border-color: salmon;
+    align-self:flex-end;
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tablewrapper {
+    height: 80%;
+    overflow: auto;
+}
+
+.movetable {
+    width: 80%;
+    height: 60vh;
+    overflow: auto;
+}
+
+.movetable tr {
+    width: 80%;
+}
+
+.movetable tr td {
+    border-style: solid;
+    border-color: salmon;
+    border-width: 2px;
+}
