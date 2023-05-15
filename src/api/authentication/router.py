@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
@@ -17,7 +17,7 @@ router = APIRouter(
 @router.get('/is_user_in_database_by_id')
 async def is_user_in_database_by_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     try:
-        if not type(user_id) is int:
+        if not isinstance(user_id, int):
             raise TypeError("Error")
         query = select(user.c.id).where(user.c.id == user_id)
         result = await session.execute(query)
@@ -36,18 +36,24 @@ async def is_user_in_database_by_id(user_id: int, session: AsyncSession = Depend
             "data": "TypeError",
             "details": f"Type of (user_id) in not int"
         }
-    except Exception:
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
+    except Exception as e:
         return {
             "status": "error",
             "data": "Exception",
-            "details": "Unknown error"
+            "details": str(e)
         }
 
 
 @router.get('/get_info_of_current_user')
 def get_info_of_current_user(curr_user: User = Depends(current_user)):
     try:
-        if type(curr_user) is int and curr_user == 401:
+        if isinstance(curr_user, int) and curr_user == 401:
             raise ExceptionUnauthorized("Error")
 
         lst = ["id", "nickname", "registration_time", "number_matches_blitz", "number_matches_rapid",
@@ -71,7 +77,7 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
         return {
             "status": "error",
             "data": "ExceptionUnauthorized",
-            "details": "User is unauthorized"
+            "details": "User is not authorized"
         }
     except SQLAlchemyError as e:
         return {
@@ -90,7 +96,7 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
 @router.get("/get_info_by_user_id")
 async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
     try:
-        if not type(user_id) is int:
+        if not isinstance(user_id, int):
             raise TypeError("Error")
         query = select(user.c.id, user.c.nickname, user.c.registration_time,
                        user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
@@ -111,7 +117,7 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
         return {
             "status": "error",
             "data": "ExceptionNoUser",
-            "details": f"No user in database with given id"
+            "details": "No user in database with given id"
         }
     except SQLAlchemyError as e:
         return {
@@ -144,6 +150,8 @@ async def get_info_of_all_users(session: AsyncSession = Depends(get_async_sessio
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
                "rate_blitz", "rate_rapid", "rate_classical"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
+        if len(list_res) == 0:
+            raise ExceptionNoUser("error")
         return {
             "status": "success",
             "data": list_res,
@@ -154,6 +162,54 @@ async def get_info_of_all_users(session: AsyncSession = Depends(get_async_sessio
             "status": "error",
             "data": "SQLAlchemyError",
             "details": f"Database error: {str(e)}"
+        }
+    except ExceptionNoUser:
+        return {
+            "status": "error",
+            "data": "ExceptionNoUser",
+            "details": "No users in database"
+        }
+    except Exception:
+        return {
+            "status": "error",
+            "data": "Exception",
+            "details": "Unknown error"
+        }
+
+
+@router.post("/delete_user_by_id")
+async def delete_user_by_id(user_id: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        if not isinstance(user_id, int):
+            TypeError("error")
+        is_user_in_db = await is_user_in_database_by_id(user_id, session)
+        if is_user_in_db["data"] == 0:
+            raise ExceptionNoUser("error")
+        stmt = delete(user).where(user.c.id == user_id)
+        await session.execute(stmt)
+        await session.commit()
+        return {
+            "status": "success",
+            "data": user_id,
+            "details": None
+        }
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
+    except ExceptionNoUser:
+        return {
+            "status": "error",
+            "data": "ExceptionNoUser",
+            "details": "No user in database with given id"
+        }
+    except TypeError:
+        return {
+            "status": "error",
+            "data": "TypeError",
+            "details": f"Type of (user_id) in not int"
         }
     except Exception:
         return {

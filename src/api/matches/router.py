@@ -28,9 +28,10 @@ async def get_matches_by_user_id(user_id: int, number_of_matches: int = -1, offs
             raise TypeError("Number of matches should be int")
         if not isinstance(offset, int):
             raise TypeError("Offset should be int")
-        if number_of_matches <= 0:
+        if number_of_matches <= 0 and number_of_matches != -1:
             raise ValueError("Number of matches should be > 0")
-        if is_user_in_database_by_id(user_id) == 0:
+        is_user_in_db = await is_user_in_database_by_id(user_id, session)
+        if is_user_in_db["data"] == 0:
             raise ExceptionNoUser("Error")
 
         if number_of_matches == -1:
@@ -114,7 +115,7 @@ async def get_matches_of_current_user(number_of_matches: int = -1, offset: int =
         return {
             "status": "error",
             "data": "ExceptionUnauthorized",
-            "details": "User is unauthorized"
+            "details": "User is not authorized"
         }
     except SQLAlchemyError as e:
         return {
@@ -143,7 +144,7 @@ async def get_matches_of_current_user(number_of_matches: int = -1, offset: int =
 
 
 # вернет последние n матчей (если n == -1, то вернет все матчи), начиная с матча с номером offset
-@router.get('/get_all_matches')
+@router.get("/get_all_matches")
 async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
                           session: AsyncSession = Depends(get_async_session)):
     try:
@@ -172,6 +173,12 @@ async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
             "data": "SQLAlchemyError",
             "details": f"Database error: {str(e)}"
         }
+    except ValueError as e:
+        return {
+            "status": "error",
+            "data": "ValueError",
+            "details": str(e)
+        }
     except TypeError as e:
         return {
             "status": "error",
@@ -186,7 +193,7 @@ async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
         }
 
 
-@router.get('/get_all_modes')
+@router.get("/get_all_modes")
 async def get_all_modes(session: AsyncSession = Depends(get_async_session)):
     try:
         query = select(mode)
@@ -212,7 +219,7 @@ async def get_all_modes(session: AsyncSession = Depends(get_async_session)):
         }
 
 
-@router.post('/add_mode')
+@router.post("/add_mode")
 async def add_mode(new_mode: ModeCreate, session: AsyncSession = Depends(get_async_session)):
     try:
         stmt = insert(mode).values(**new_mode.dict())
@@ -220,7 +227,7 @@ async def add_mode(new_mode: ModeCreate, session: AsyncSession = Depends(get_asy
         await session.commit()
         return {
             "status": "success",
-            "data": new_mode.dict(),
+            "data": new_mode.id,
             "details": None
         }
     except SQLAlchemyError as e:

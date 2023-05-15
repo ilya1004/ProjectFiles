@@ -8,3 +8,5 @@ mysql
 mysql-connector-python
 fastapi-users[sqlalchemy]
 pydantic
+pytest
+pytest-asyncio
