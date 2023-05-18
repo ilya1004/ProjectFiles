@@ -1,7 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, MetaData
 from src.api.authentication.models import user
-from src.database import metadata
+# from src.database import metadata
+
+metadata = MetaData()
 
 mode = Table(
     'mode',
@@ -20,6 +22,8 @@ match = Table(
     Column('game_length_sec', Integer, nullable=False),
     Column('player_1_id', Integer, ForeignKey(user.c.id), nullable=False),
     Column('player_2_id', Integer, ForeignKey(user.c.id), nullable=False),
+    Column('player_1_nickname', String(50), nullable=False),
+    Column('player_2_nickname', String(50), nullable=False),
     Column('rate_change_player_1', Integer, nullable=False),
     Column('rate_change_player_2', Integer, nullable=False),
 )

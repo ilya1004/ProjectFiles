@@ -2,10 +2,11 @@ from fastapi import WebSocket
 
 
 class Player:
-    def __init__(self, websocket: WebSocket, player_id: int,
+    def __init__(self, websocket: WebSocket, player_id: int, player_nickname,
                  rate_blitz: int, rate_rapid: int, rate_classical: int, mode_id: int, is_rate: bool):
         self.websocket = websocket
         self.player_id = player_id
+        self.player_nickname = player_nickname
         self.rate_blitz = rate_blitz
         self.rate_rapid = rate_rapid
         self.rate_classical = rate_classical

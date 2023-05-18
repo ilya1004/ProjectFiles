@@ -29,7 +29,8 @@ async def add_to_queue_ws(websocket: WebSocket, mode_id: int, user=Depends(curre
         else:
             is_rate = False
         await manager.connect_user(websocket)
-        player = Player(websocket, user.id, user.rate_blitz, user.rate_rapid, user.rate_classical, mode_id, is_rate)
+        player = Player(websocket, user.id, user.nickname,
+                        user.rate_blitz, user.rate_rapid, user.rate_classical, mode_id, is_rate)
         manager.add_player_to_queue(player)
         player1, player2 = manager.find_new_game(mode_id)
 
@@ -90,9 +91,12 @@ async def add_to_queue_ws(websocket: WebSocket, mode_id: int, user=Depends(curre
                 await manager.update_users_rate_in_db(mode_id, player_winner, player_loser,
                                                       rate_change_winner, rate_change_loser)
             await manager.add_match_to_db(mode_id, time_start, game_length,
+                                          player_winner.nickname,
                                           player_winner.player_id, player_loser.player_id,
                                           rate_change_winner, rate_change_loser)
             manager.delete_game_from_list(game)
+            await player1.send_message("disconnecting")
+            await player2.send_message("disconnecting")
             await manager.disconnect_user(player1)
             await manager.disconnect_user(player2)
 

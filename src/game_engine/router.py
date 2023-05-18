@@ -24,7 +24,7 @@ async def update_user_rate(user_id: int, mode_id: int, curr_rate: int, rate_diff
             raise TypeError("User ID should be int")
         if not isinstance(mode_id, int):
             raise TypeError("Mode ID should be int")
-        if not isinstance(curr_rate, int) or not isinstance(rate_diff):
+        if not isinstance(curr_rate, int) or not isinstance(rate_diff, int):
             raise TypeError("Rate should be int")
         if mode_id not in range(0, 9):
             raise ValueError("Invalid mode id")
@@ -81,6 +81,7 @@ async def update_user_rate(user_id: int, mode_id: int, curr_rate: int, rate_diff
 
 @router.post('/add_new_match')
 async def add_new_match(mode_id: int, played_at: datetime, game_length: int,
+                        player_winner_nickname: str, player_loser_nickname: str,
                         player_winner_id: int, player_loser_id: int,
                         rate_change_winner: int, rate_change_loser: int,
                         session: AsyncSession = Depends(get_async_session)):
@@ -104,6 +105,8 @@ async def add_new_match(mode_id: int, played_at: datetime, game_length: int,
             "game_length_sec": game_length,
             "player_1_id": player_winner_id,
             "player_2_id": player_loser_id,
+            "player_1_nickname": player_winner_nickname,
+            "player_2_nickname": player_loser_nickname,
             "rate_change_player_1": rate_change_winner,
             "rate_change_player_2": rate_change_loser
         }

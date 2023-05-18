@@ -167,10 +167,14 @@ class ConnectionManager:
         return None
 
     @staticmethod
-    async def add_match_to_db(mode_id: int, played_at: datetime, game_length: int, player_winner_id: int,
-                              player_loser_id: int, rate_change_winner: int, rate_change_loser: int):
-        await add_new_match(mode_id, played_at, game_length, player_winner_id,
-                            player_loser_id, rate_change_winner, rate_change_loser)
+    async def add_match_to_db(mode_id: int, played_at: datetime, game_length: int,
+                              player_winner_nickname: str, player_loser_nickname: str,
+                              player_winner_id: int, player_loser_id: int,
+                              rate_change_winner: int, rate_change_loser: int):
+        await add_new_match(mode_id, played_at, game_length,
+                            player_winner_nickname, player_loser_nickname,
+                            player_winner_id, player_loser_id,
+                            rate_change_winner, rate_change_loser)
 
     @staticmethod
     def rate_compare_blitz(player: Player):

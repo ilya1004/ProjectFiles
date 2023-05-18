@@ -40,7 +40,7 @@ async def get_matches_by_user_id(user_id: int, number_of_matches: int = -1, offs
             query = select(match).where((match.c.player_1_id == user_id) | (match.c.player_2_id == user_id)) \
                 .order_by(match.c.id.desc()).offset(offset).limit(number_of_matches)
         result = await session.execute(query)
-        lst = ["id", "mode_id", "played_at", "game_length_sec",
+        lst = ["id", "mode_id", "played_at", "game_length_sec", "player_1_nickname", "player_2_nickname",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
@@ -90,7 +90,7 @@ async def get_matches_of_current_user(number_of_matches: int = -1, offset: int =
             raise TypeError("Number of matches should be int")
         if not isinstance(offset, int):
             raise TypeError("Offset should be int")
-        if number_of_matches <= 0:
+        if number_of_matches <= 0 and number_of_matches != -1:
             raise ValueError("Number of matches should be > 0")
         if offset < 0:
             raise ValueError("Offset should be >= 0")
@@ -103,7 +103,7 @@ async def get_matches_of_current_user(number_of_matches: int = -1, offset: int =
             query = select(match).where((match.c.player_1_id == user.id) | (match.c.player_2_id == user.id)) \
                 .order_by(match.c.id.desc()).offset(offset).limit(number_of_matches)
         result = await session.execute(query)
-        lst = ["id", "mode_id", "played_at", "game_length_sec",
+        lst = ["id", "mode_id", "played_at", "game_length_sec", "player_1_nickname", "player_2_nickname",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
@@ -152,14 +152,17 @@ async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
             raise TypeError("Number of matches should be int")
         if not isinstance(offset, int):
             raise TypeError("Offset should be int")
-        if number_of_matches <= 0:
+        if number_of_matches <= 0 and number_of_matches != -1:
             raise ValueError("Number of matches should be > 0")
         if offset < 0:
             raise ValueError("Offset should be >= 0")
 
-        query = select(match)
+        if number_of_matches == -1:
+            query = select(match)
+        else:
+            query = select(match).order_by(match.c.id.desc()).offset(offset).limit(number_of_matches)
         result = await session.execute(query)
-        lst = ["id", "mode_id", "played_at", "game_length_sec",
+        lst = ["id", "mode_id", "played_at", "game_length_sec", "player_1_nickname", "player_2_nickname",
                "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
