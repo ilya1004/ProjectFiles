@@ -191,8 +191,9 @@ class Board:
         self._rb_rook = True
         self._w_king = True
         self._b_king = True
+
         self._count_of_passive_moves = 0
-        self._move_number = 0
+        self._move_number = 1
         self._available_moves = [[(), ((2, 2), (0, 2)), (), (), (), (), ((7, 2), (5, 2)), (), ()], [((0, 2), (0, 3)), ((1, 2), (1, 3)), ((2, 2), (2, 3)), ((3, 2), (3, 3)), ((4, 2), (4, 3)), ((5, 2), (5, 3)), ((6, 2), (6, 3)), ((7, 2), (7, 3)), ((8, 2), (8, 3))], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [((0, 6), (0, 5)), ((1, 6), (1, 5)), ((2, 6), (2, 5)), ((3, 6), (3, 5)), ((4, 6), (4, 5)), ((5, 6), (5, 5)), ((6, 6), (6, 5)), ((7, 6), (7, 5)), ((8, 6), (8, 5))], [(), (), ((1, 6), (3, 6)), (), (), (), (), ((6, 6), (8, 6)), ()]]
         self.board = [
             [self.Rook('black'), self.Knight('black'), self.Bishop('black'), self.Queen('black'), self.King('black'),
@@ -499,20 +500,27 @@ class Board:
                 print(figure, end=' ')
             print()
 
+    def board_condition(self) -> str:
+        s = ''
+        for line in self.board:
+            for figure in line:
+                s += figure.__str__()
+        return s
+
     def throne_is_captured(self, side):
         if self.board[4][4].color() == side:
             return True
         return False
-
-    def move_number(self):
-        return self._move_number
 
     def no_active_moves(self):
         if self._count_of_passive_moves >= 100:
             return True
         return False
 
-    def make_a_move(self, x1, y1, x2, y2, color_move) -> int:
+    def make_a_move(self, x1, y1, x2, y2) -> int:
+
+        color_move = 'white' if self._move_number % 2 else 'black'
+
         if x1 not in transform_x or x2 not in transform_x or y1 not in transform_y or y2 not in transform_y:
             print('Incorrect input')
             return 0
@@ -562,9 +570,6 @@ class Board:
             else:
                 self._count_of_passive_moves = 0
 
-            if self.board[y1][x1].color() == 'white':
-                self._move_number += 1
-
             self.board[y2][x2] = self.board[y1][x1]
             self.board[y1][x1] = self.Void('')
         else:
@@ -599,6 +604,7 @@ class Board:
                             print('You prince is alive')
                             continue
         self._available_moves = [[self.available_move(k, j) if self.board[j][k].color() in ('white', 'black') else () for k in range(9)] for j in range(9)]
+        self._move_number += 1
         return 1
 
 
@@ -615,11 +621,9 @@ board = Board()
 board.show()
 
 
-i = 1
 while True:
     n = int(input())
     if n == 1:
-        color = 'white' if i % 2 else 'black'
         if board.throne_is_captured('white'):
             print('White captured the throne. White won')
             break
@@ -636,21 +640,18 @@ while True:
             print('50 moves have passed without capturing any piece.')
             break
         x1, y1, x2, y2 = (i for i in input())
-        res = board.make_a_move(x1, y1, x2, y2, color)
-        if res == 1:
-            i += 1
+        res = board.make_a_move(x1, y1, x2, y2)
     elif n == 2:
-        #try:
-            x1, y1 = (i for i in input())
-            print(board.get_available_moves(transform_x[x1], transform_y[y1], for_user=True))
-        # except:
-        #     print('Error')
-    elif n == 3:
-        print(board.move_number())
+        x1, y1 = (i for i in input())
+        print(board.get_available_moves(transform_x[x1], transform_y[y1], for_user=True))
     elif n == 4:
-        print('White' if i % 2 else 'Black')
+        pass
+    elif n == 5:
+        print(board.board_condition())
 
     board.show()
+
+
 
 
 
