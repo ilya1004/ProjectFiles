@@ -184,7 +184,13 @@ class Board:
         def cost(self):
             return 0
 
-    def __init__(self):
+    def __init__(self, player1: Player, player2: Player, mode_id: int, time_start: datetime, is_rated: bool):
+        self.player1 = player1
+        self.player2 = player2
+        self.mode_id = mode_id
+        self.time_start = time_start
+        self.is_rated = is_rated
+
         self._lw_rook = True
         self._rw_rook = True
         self._lb_rook = True
@@ -500,13 +506,6 @@ class Board:
                 print(figure, end=' ')
             print()
 
-    def board_condition(self) -> str:
-        s = ''
-        for line in self.board:
-            for figure in line:
-                s += figure.__str__()
-        return s
-
     def throne_is_captured(self, side):
         if self.board[4][4].color() == side:
             return True
@@ -516,6 +515,41 @@ class Board:
         if self._count_of_passive_moves >= 100:
             return True
         return False
+
+    # возвращает True если последний ход привел к завершению партии
+    def is_game_end(self) -> bool:
+        if self.throne_is_captured('white') or self.throne_is_captured('black') \
+                or not self.king_is_alive('white') or not self.king_is_alive('black'):
+            return True
+        return False
+
+    # возвращает объект Player того кто выйграл
+    def get_winner(self) -> Player:
+        if self.throne_is_captured('white') or not self.king_is_alive('black'):
+            return self.player1
+        elif self.throne_is_captured('black') or not self.king_is_alive('white'):
+            return self.player2
+        return None
+
+    # возвращает объект Player того кто проиграл
+    def get_loser(self):
+        if self.throne_is_captured('white') or not self.king_is_alive('black'):
+            return self.player2
+        elif self.throne_is_captured('black') or not self.king_is_alive('white'):
+            return self.player1
+        return None
+
+    # это вместо json
+    def board_condition(self) -> str:
+        s = ''
+        for line in self.board:
+            for figure in line:
+                s += figure.__str__()
+        return s
+
+    # Вовзращает 1 или 2 в зависимости от того, чей ход (1го игрока или 2го)
+    def get_id_player_to_move(self):
+        return 1 if self._move_number % 2 else 2 
 
     def make_a_move(self, x1, y1, x2, y2) -> int:
 
@@ -650,7 +684,6 @@ while True:
         print(board.board_condition())
 
     board.show()
-
 
 
 
