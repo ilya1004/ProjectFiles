@@ -34,8 +34,6 @@ class Game:
         pass
 
 
-
-
 def illegal_move() -> None:
     print('Illegal move')
 
@@ -193,13 +191,10 @@ class Board:
         self._rb_rook = True
         self._w_king = True
         self._b_king = True
-        self._white_king_coords = (4, 8)
-        self._black_king_coords = (4, 0)
-        self._white_prince_coords = (5, 8)
-        self._black_prince_coords = (6, 0)
-        self._controlled_by_black = ()
-        self._controlled_by_white = ()
-        self.__board = [
+        self._count_of_passive_moves = 0
+        self._move_number = 0
+        self._available_moves = [[(), ((2, 2), (0, 2)), (), (), (), (), ((7, 2), (5, 2)), (), ()], [((0, 2), (0, 3)), ((1, 2), (1, 3)), ((2, 2), (2, 3)), ((3, 2), (3, 3)), ((4, 2), (4, 3)), ((5, 2), (5, 3)), ((6, 2), (6, 3)), ((7, 2), (7, 3)), ((8, 2), (8, 3))], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [(), (), (), (), (), (), (), (), ()], [((0, 6), (0, 5)), ((1, 6), (1, 5)), ((2, 6), (2, 5)), ((3, 6), (3, 5)), ((4, 6), (4, 5)), ((5, 6), (5, 5)), ((6, 6), (6, 5)), ((7, 6), (7, 5)), ((8, 6), (8, 5))], [(), (), ((1, 6), (3, 6)), (), (), (), (), ((6, 6), (8, 6)), ()]]
+        self.board = [
             [self.Rook('black'), self.Knight('black'), self.Bishop('black'), self.Queen('black'), self.King('black'),
              self.Prince('black'), self.Knight('black'), self.Bishop('black'), self.Rook('black')],
             [self.Pawn('black')] * 9,
@@ -215,10 +210,10 @@ class Board:
         ]
 
     def check_move(self, temp_figure_, x_, y_, legal_moves_, for_user) -> bool:
-        if self.__board[y_][x_].color() == '':
+        if self.board[y_][x_].color() == '':
             legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
                 else legal_moves_.append((x_, y_))
-        elif temp_figure_.color() != self.__board[y_][x_].color() != 'gray':
+        elif temp_figure_.color() != self.board[y_][x_].color() != 'gray':
             legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
                 else legal_moves_.append((x_, y_))
             return True
@@ -226,10 +221,20 @@ class Board:
             return True
 
     def check_prince_move(self, temp_figure_, x_, y_, legal_moves_, for_user) -> bool:
-        if self.__board[y_][x_].color() in ('', 'gray'):
+        king_coords = self.find_king(temp_figure_.color())
+        if self.board[y_][x_].color() == '':
             legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
                 else legal_moves_.append((x_, y_))
-        elif temp_figure_.color() != self.__board[y_][x_].color():
+        elif self.board[y_][x_].color() == 'gray':
+            if temp_figure_.color() == 'white' and not self.throne_is_under_control('black')\
+                    and 2 <= king_coords[0] <= 6 and 2 <= king_coords[1] <= 6:
+                legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
+                    else legal_moves_.append((x_, y_))
+            if temp_figure_.color() == 'black' and not self.throne_is_under_control('white') \
+                    and 2 <= king_coords[0] <= 6 and 2 <= king_coords[1] <= 6:
+                legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
+                    else legal_moves_.append((x_, y_))
+        elif temp_figure_.color() != self.board[y_][x_].color():
             legal_moves_.append((transform_back_x[x_], transform_back_y[y_])) if for_user \
                 else legal_moves_.append((x_, y_))
             return True
@@ -237,29 +242,20 @@ class Board:
             return True
 
     def available_move(self, start_x, start_y, for_user=False) -> tuple:
-        temp_figure = self.__board[start_y][start_x]
+        temp_figure = self.board[start_y][start_x]
         legal_moves = []
 
         if type(temp_figure) == self.Knight:
             moves = ((1, 2), (2, 1), (-1, -2), (-2, -1), (1, -2), (-1, 2), (2, -1), (-2, 1))
-            t1 = type(temp_figure)
-            c1 = temp_figure.color()
-            self.__board[start_y][start_x] = self.Void('')
             for dx, dy in moves:
                 new_x = start_x + dx
                 new_y = start_y + dy
                 if -1 < new_x < 9 and -1 < new_y < 9 and \
-                        temp_figure.color() != self.__board[new_y][new_x].color() != 'gray':
-                    t2 = type(self.__board[new_y][new_x])
-                    c2 = self.__board[new_y][new_x].color()
-                    self.__board[new_y][new_x] = self.Knight(c1)
-                    if not self.king_is_checked(c1):
-                        if for_user:
-                            legal_moves.append((transform_back_x[new_x], transform_back_y[new_y]))
-                        else:
-                            legal_moves.append((new_x, new_y))
-                    self.__board[new_y][new_x] = t2(c2)
-            self.__board[start_y][start_x] = t1(c1)
+                        temp_figure.color() != self.board[new_y][new_x].color() != 'gray':
+                    if for_user:
+                        legal_moves.append((transform_back_x[new_x], transform_back_y[new_y]))
+                    else:
+                        legal_moves.append((new_x, new_y))
 
         elif type(temp_figure) == self.Rook:
             for new_x in range(start_x - 1, -1, -1):
@@ -350,31 +346,35 @@ class Board:
             for dx, dy in moves:
                 new_x = start_x + dx
                 new_y = start_y + dy
-                if -1 < new_x < 9 and -1 < new_y < 9 and \
-                    temp_figure.color() != self.__board[new_y][new_x].color() or \
-                        new_y == 4 and new_x == 4:
-                    if self.find_prince(self.__board[start_y][start_x].color()) != (-1, -1):
+                if new_x == 4 and new_y == 4:
+                    if temp_figure.color() == 'black' and not self.throne_is_under_control('white'):
                         if for_user:
                             legal_moves.append((transform_back_x[new_x], transform_back_y[new_y]))
                         else:
                             legal_moves.append((new_x, new_y))
-                    elif not self.is_under_control(new_x, new_y, temp_figure.color()):
+                    elif temp_figure.color() == 'white' and not self.throne_is_under_control('black'):
                         if for_user:
                             legal_moves.append((transform_back_x[new_x], transform_back_y[new_y]))
                         else:
                             legal_moves.append((new_x, new_y))
+                elif -1 < new_x < 9 and -1 < new_y < 9 and \
+                    temp_figure.color() != self.board[new_y][new_x].color():
+                    if for_user:
+                        legal_moves.append((transform_back_x[new_x], transform_back_y[new_y]))
+                    else:
+                        legal_moves.append((new_x, new_y))
             if temp_figure.color() == 'white':
                 if self._w_king:
-                    if self._rw_rook and self.__board[8][5].color() == '' and \
-                            self.__board[8][6].color() == '' and self.__board[8][7].color() == '':
+                    if self._rw_rook and self.board[8][5].color() == '' and \
+                            self.board[8][6].color() == '' and self.board[8][7].color() == '':
                         if for_user:
                             legal_moves.append(('g', '1'))
                             legal_moves.append(('h', '1'))
                         else:
                             legal_moves.append((6, 8))
                             legal_moves.append((7, 8))
-                    if self._lw_rook and self.__board[8][3].color() == '' and \
-                            self.__board[8][2].color() == '' and self.__board[8][1].color() == '':
+                    if self._lw_rook and self.board[8][3].color() == '' and \
+                            self.board[8][2].color() == '' and self.board[8][1].color() == '':
                         if for_user:
                             legal_moves.append(('c', '1'))
                             legal_moves.append(('b', '1'))
@@ -383,16 +383,16 @@ class Board:
                             legal_moves.append((1, 8))
             elif temp_figure.color() == 'black':
                 if self._b_king:
-                    if self._rb_rook and self.__board[0][5].color() == '' and \
-                            self.__board[0][6].color() == '' and self.__board[9][7].color() == '':
+                    if self._rb_rook and self.board[0][5].color() == '' and \
+                            self.board[0][6].color() == '' and self.board[9][7].color() == '':
                         if for_user:
                             legal_moves.append(('g', '9'))
                             legal_moves.append(('h', '9'))
                         else:
                             legal_moves.append((6, 0))
                             legal_moves.append((7, 0))
-                    if self._lw_rook and self.__board[0][3].color() == '' and \
-                            self.__board[0][2].color() == '' and self.__board[0][1].color() == '':
+                    if self._lw_rook and self.board[0][3].color() == '' and \
+                            self.board[0][2].color() == '' and self.board[0][1].color() == '':
                         if for_user:
                             legal_moves.append(('c', '9'))
                             legal_moves.append(('b', '9'))
@@ -402,43 +402,43 @@ class Board:
 
         elif type(temp_figure) == self.Pawn:
             if temp_figure.color() == 'white':
-                if self.__board[start_y - 1][start_x].color() == '':
+                if self.board[start_y - 1][start_x].color() == '':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x], transform_back_y[start_y - 1]))
                     else:
                         legal_moves.append((start_x, start_y - 1))
-                    if start_y == 7 and self.__board[start_y - 2][start_x].color() == '':
+                    if start_y == 7 and self.board[start_y - 2][start_x].color() == '':
                         if for_user:
                             legal_moves.append((transform_back_x[start_x], transform_back_y[start_y - 2]))
                         else:
                             legal_moves.append((start_x, start_y - 2))
-                if start_x + 1 != 9 and self.__board[start_y - 1][start_x + 1].color() == 'black':
+                if start_x + 1 != 9 and self.board[start_y - 1][start_x + 1].color() == 'black':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x + 1], transform_back_y[start_y - 1]))
                     else:
                         legal_moves.append((start_x + 1, start_y - 1))
-                if start_x - 1 != -1 and self.__board[start_y - 1][start_x - 1].color() == 'black':
+                if start_x - 1 != -1 and self.board[start_y - 1][start_x - 1].color() == 'black':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x - 1], transform_back_y[start_y - 1]))
                     else:
                         legal_moves.append((start_x - 1, start_y - 1))
             elif temp_figure.color() == 'black':
-                if self.__board[start_y + 1][start_x].color() == '':
+                if self.board[start_y + 1][start_x].color() == '':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x], transform_back_y[start_y + 1]))
                     else:
                         legal_moves.append((start_x, start_y + 1))
-                    if start_y == 1 and self.__board[start_y + 2][start_x].color() == '':
+                    if start_y == 1 and self.board[start_y + 2][start_x].color() == '':
                         if for_user:
                             legal_moves.append((transform_back_x[start_x], transform_back_y[start_y + 2]))
                         else:
                             legal_moves.append((start_x, start_y + 2))
-                if start_x + 1 != 9 and self.__board[start_y + 1][start_x + 1].color() == 'white':
+                if start_x + 1 != 9 and self.board[start_y + 1][start_x + 1].color() == 'white':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x + 1], transform_back_y[start_y + 1]))
                     else:
                         legal_moves.append((start_x + 1, start_y + 1))
-                if start_x - 1 != -1 and self.__board[start_y + 1][start_x - 1].color() == 'white':
+                if start_x - 1 != -1 and self.board[start_y + 1][start_x - 1].color() == 'white':
                     if for_user:
                         legal_moves.append((transform_back_x[start_x - 1], transform_back_y[start_y + 1]))
                     else:
@@ -446,110 +446,72 @@ class Board:
 
         return tuple(legal_moves)
 
-    def is_under_control(self, x, y, side) -> bool:
+    def throne_is_under_control(self, side):
         anti_side = 'white' if side == 'black' else 'black'
-        t = type(self.__board[y][x])
-        c = self.__board[y][x].color()
-        self.__board[y][x] = self.Knight(anti_side)
+        y = 4
+        x = 4
+        self.board[y][x] = self.Knight(anti_side)
         for i in range(9):
             for j in range(9):
-                if self.__board[j][i].color() == side and (x, y) in self.available_move(i, j):
-                    self.__board[y][x] = t(c)
+                if self.board[j][i].color() == side and type(self.board[j][i]) != self.King \
+                        and (x, y) in self.available_move(i, j):
+                    self.board[y][x] = self.Throne('gray')
                     return True
-        self.__board[y][x] = t(c)
-        return False
-
-    def is_under_attack(self, start_x, start_y) -> bool:
-        if self.__board[start_y][start_x].color() == 'white':
-            for i in range(9):
-                for j in range(9):
-                    if (start_x, start_y) in self.available_move(i, j) and self.__board[j][i].color() == 'black':
-                        return True
-            return False
-        elif self.__board[start_y][start_x].color() == 'black':
-            for i in range(9):
-                for j in range(9):
-                    if (start_x, start_y) in self.available_move(i, j) and self.__board[j][i].color() == 'white':
-                        return True
-            return False
+        self.board[y][x] = self.Throne('gray')
         return False
 
     def find_prince(self, side):
-        return self._white_prince_coords if side == 'white' else self._black_prince_coords
-
-    def find_king(self, side):
-        return self._white_king_coords if side == 'white' else self._black_king_coords
-
-    def king_is_checked(self, side):
-        x, y = 0, 0
-        if self.find_prince(side=side) != (-1, -1):
-            return False
-        x, y = self.find_king(side=side)
         for i in range(9):
             for j in range(9):
-                if (x, y) in self.available_move(i, j) and self.__board[j][i].color() == side:
-                    return True
-        return False
+                if self.board[i][j].color() == side and type(self.board[i][j]) == self.Prince:
+                    return j, i
+        return -1, -1
+
+    def find_king(self, side):
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j].color() == side and type(self.board[i][j]) == self.King:
+                    return j, i
+        return -1, -1
+
+    def get_available_moves(self, x, y, for_user=False):
+        if for_user:
+            return tuple((transform_back_x[m[0]], transform_back_y[m[1]]) for m in self._available_moves[y][x])
+        return self._available_moves[y][x]
 
     def king_is_alive(self, side):
         for i in range(9):
             for j in range(9):
-                if type(self.__board[i][j]) == self.King and self.__board[i][j].color() == side:
+                if type(self.board[i][j]) == self.King and self.board[i][j].color() == side:
                     return True
         return False
 
     def prince_is_alive(self, side):
         for i in range(9):
             for j in range(9):
-                if type(self.__board[i][j]) == self.Prince and self.__board[i][j].color() == side:
+                if type(self.board[i][j]) == self.Prince and self.board[i][j].color() == side:
                     return True
         return False
 
-    def find_piece(self, kind, color):
-        for i in range(9):
-            for j in range(9):
-                if type(self.__board[i][j]) == kind and self.__board[i][j].color() == color:
-                    return j, i
-        return -1, -1
-
     def show(self) -> None:
-        for line in self.__board:
+        for line in self.board:
             for figure in line:
                 print(figure, end=' ')
             print()
 
-    def white_capture_throne(self, color_move):
-        x, y = self.find_piece(self.King, 'white')
-        if color_move == 'white' and self.__board[4][4].color() == 'white' and \
-            not self.is_under_attack(4, 4) and ((type(self.__board[4][4]) == self.King or
-            type(self.__board[4][4]) == self.Prince and 2 <= x <= 6 and 2 <= y <= 6)):
+    def throne_is_captured(self, side):
+        if self.board[4][4].color() == side:
             return True
         return False
 
-    def black_capture_throne(self, color_move):
-        x, y = self.find_piece(self.King, 'black')
-        if color_move == 'black' and self.__board[4][4].color() == 'black' and \
-            not self.is_under_attack(4, 4) and ((type(self.__board[4][4]) == self.King or
-            type(self.__board[4][4]) == self.Prince and 2 <= x <= 6 and 2 <= y <= 6)):
+    def move_number(self):
+        return self._move_number
+
+    def no_active_moves(self):
+        if self._count_of_passive_moves >= 100:
             return True
         return False
 
-    def statement(self, color_move):
-        for i in range(9):
-            for j in range(9):
-                if self.__board[i][j].color() == color_move and self.available_move(i, j):
-                    return False
-        return True
-
-    '''
-    0 - ход не сделан
-    1 - ход сделан
-    2 - белые победили(захват трона)
-    3 - черные победили(захват трона)
-    4 - белые победили(мат)
-    5 - черные победили(мат)
-    6 - ничья
-    '''
     def make_a_move(self, x1, y1, x2, y2, color_move) -> int:
         if x1 not in transform_x or x2 not in transform_x or y1 not in transform_y or y2 not in transform_y:
             print('Incorrect input')
@@ -560,83 +522,83 @@ class Board:
         x2 = transform_x[x2]
         y2 = transform_y[y2]
 
-        if color_move != self.__board[y1][x1].color():
+        if color_move != self.board[y1][x1].color():
             incorrect_color()
             return 0
 
-        if (x2, y2) in self.available_move(x1, y1):
-            if type(self.__board[y1][x1]) == self.King:
-                if self.__board[y1][x1].color() == 'white':
+        if (x2, y2) in self.get_available_moves(x1, y1):
+            if type(self.board[y1][x1]) == self.King:
+                if self.board[y1][x1].color() == 'white':
                     self._w_king = 0
-                    self._white_king_coords = (x2, y2)
-                elif self.__board[y1][x1].color() == 'black':
+                elif self.board[y1][x1].color() == 'black':
                     self._b_king = 0
-                    self._black_king_coords = (x2, y2)
-            elif type(self.__board[y1][x1]) == self.Rook:
-                if self.__board[y1][x1].color() == 'white':
+            elif type(self.board[y1][x1]) == self.Rook:
+                if self.board[y1][x1].color() == 'white':
                     if x1 == 8:
                         self._rw_rook = 0
                     elif x1 == 0:
                         self._lw_rook = 0
-                elif self.__board[y1][x1].color() == 'black':
+                elif self.board[y1][x1].color() == 'black':
                     if x1 == 8:
                         self._rb_rook = 0
                     elif x1 == 0:
                         self._lb_rook = 0
-            if type(self.__board[y1][x1]) == self.Prince:
-                if self.__board[y1][x1].color() == 'white':
-                    self._white_prince_coords = (x2, y2)
-                elif self.__board[y1][x1].color() == 'black':
-                    self._black_prince_coords = (x2, y2)
 
-            if type(self.__board[y1][x1]) == self.King:
+            if type(self.board[y1][x1]) == self.King:
                 if x2 - x1 > 1:
-                    self.__board[y2][x2 - 1] = self.__board[y2][8]
-                    self.__board[y2][8] = self.Void('')
+                    self.board[y2][x2 - 1] = self.board[y2][8]
+                    self.board[y2][8] = self.Void('')
                 elif x1 - x2 > 1:
-                    self.__board[y2][x2 + 1] = self.__board[y2][0]
-                    self.__board[y2][0] = self.Void('')
+                    self.board[y2][x2 + 1] = self.board[y2][0]
+                    self.board[y2][0] = self.Void('')
 
-            if type(self.__board[y2][x2]) == self.King:
-                temp = self.find_prince(side=self.__board[y2][x2].color())
-                if temp != (-1, -1):
-                    self.__board[temp[1]][temp[0]] = self.King(self.__board[y2][x2].color())
-                    if self.__board[y2][x2].color() == 'white':
-                        self._white_king_coords = (temp[1], temp[0])
-                    else:
-                        self._black_king_coords = (temp[1], temp[0])
+            if type(self.board[y2][x2]) == self.King:
+                coords = self.find_prince(self.board[y2][x2].color())
+                if coords != (-1, -1):
+                    self.board[coords[1]][coords[0]] = self.King(self.board[y2][x2].color())
 
-            elif type(self.__board[y2][x2]) == self.Prince:
-                if self.__board[y2][x2].color() == 'white':
-                    self._white_prince_coords = (-1, -1)
-                else:
-                    self._black_prince_coords = (-1, -1)
+            if self.board[y2][x2].color() == '':
+                self._count_of_passive_moves += 1
+            else:
+                self._count_of_passive_moves = 0
 
-            self.__board[y2][x2] = self.__board[y1][x1]
-            self.__board[y1][x1] = self.Void('')
+            if self.board[y1][x1].color() == 'white':
+                self._move_number += 1
+
+            self.board[y2][x2] = self.board[y1][x1]
+            self.board[y1][x1] = self.Void('')
         else:
             unavailable_move()
             return 0
 
-        if type(self.__board[y2][x2]) == self.Pawn:
-            if self.__board[y2][x2].color() == 'white' and y2 == 0:
-                new_piece = input()
-                if new_piece not in transform_white_pawn:
-                    illegal_move()
-                    return 0
-                else:
-                    if new_piece != 'a' or new_piece == 'a' and self._white_prince_coords == (-1, -1):
-                        self.__board[y2][x2] = transform_white_pawn[new_piece]
-                    return 1
-            elif self.__board[y2][x2].color() == 'black' and y2 == 8:
-                new_piece = input()
-                if new_piece not in transform_black_pawn:
-                    illegal_move()
-                    return 0
-                else:
-                    if new_piece != 'A' or new_piece == 'A' and self._black_prince_coords == (-1, -1):
-                        self.__board[y2][x2] = transform_black_pawn[new_piece]
-                    return 1
+        if type(self.board[y2][x2]) == self.Pawn:
+            if self.board[y2][x2].color() == 'white' and y2 == 0:
+                while True:
+                    new_piece = input()
+                    if new_piece not in transform_white_pawn:
+                        print('there is no piece with that name')
+                        continue
+                    else:
+                        if new_piece != 'a' or new_piece == 'a' and not self.prince_is_alive('white'):
+                            self.board[y2][x2] = transform_white_pawn[new_piece]
+                            break
+                        else:
+                            print('You prince is alive')
+                            continue
+            elif self.board[y2][x2].color() == 'black' and y2 == 8:
+                while True:
+                    new_piece = input()
+                    if new_piece not in transform_black_pawn:
+                        print('there is no piece with that name')
+                        continue
+                    else:
+                        if new_piece != 'A' or new_piece == 'A' and not self.prince_is_alive('black'):
+                            self.board[y2][x2] = transform_black_pawn[new_piece]
+                            break
+                        else:
+                            print('You prince is alive')
+                            continue
+        self._available_moves = [[self.available_move(k, j) if self.board[j][k].color() in ('white', 'black') else () for k in range(9)] for j in range(9)]
         return 1
 
 
@@ -653,52 +615,42 @@ board = Board()
 board.show()
 
 
-# i = 1
-# while True:
-#     n = int(input())
-#     if n == 1:
-#         try:
-#             color = 'white' if i % 2 else 'black'
-#             if board.white_capture_throne(color):
-#                 print('White won')
-#                 break
-#             if board.black_capture_throne(color):
-#                 print('Black won')
-#                 break
-#             if board.statement(color):
-#                 print('Stalemate')
-#                 break
-#             x1, y1, x2, y2 = (i for i in input())
-#             res = board.make_a_move(x1, y1, x2, y2, color)
-#             if res == 1:
-#                 i += 1
-#         except:
-#             print('Error')
-#     elif n == 2:
-#         #try:
-#             x1, y1 = (i for i in input())
-#             print(board.available_move(transform_x[x1], transform_y[y1], for_user=True))
-#             print(1 + 1)
-#         # except:
-#         #     print('Error')
-#     elif n == 3:
-#         try:
-#             x1, y1 = (i for i in input())
-#             print(board.is_under_attack(transform_x[x1], transform_y[y1]))
-#         except:
-#             print('Error')
-#     elif n == 4:
-#         print('White' if i % 2 else 'Black')
-#     elif n == 5:
-#         print('Draw')
-#         break
-#     elif n == 6:
-#         try:
-#             x1, y1 = (i for i in input())
-#             print(board.is_under_control(transform_x[x1], transform_y[y1], 'white'))
-#             print(board.is_under_control(transform_x[x1], transform_y[y1], 'black'))
-#         except:
-#             print('Error')
-#     board.show()
+i = 1
+while True:
+    n = int(input())
+    if n == 1:
+        color = 'white' if i % 2 else 'black'
+        if board.throne_is_captured('white'):
+            print('White captured the throne. White won')
+            break
+        if board.throne_is_captured('black'):
+            print('Black cpatured the throne. Black won')
+            break
+        if not board.king_is_alive('white'):
+            print('White king and prince are dead. Black won')
+            break
+        if not board.king_is_alive('black'):
+            print('Black king and prince are dead. White won')
+            break
+        if board.no_active_moves():
+            print('50 moves have passed without capturing any piece.')
+            break
+        x1, y1, x2, y2 = (i for i in input())
+        res = board.make_a_move(x1, y1, x2, y2, color)
+        if res == 1:
+            i += 1
+    elif n == 2:
+        #try:
+            x1, y1 = (i for i in input())
+            print(board.get_available_moves(transform_x[x1], transform_y[y1], for_user=True))
+        # except:
+        #     print('Error')
+    elif n == 3:
+        print(board.move_number())
+    elif n == 4:
+        print('White' if i % 2 else 'Black')
+
+    board.show()
+
 
 
