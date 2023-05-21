@@ -653,52 +653,52 @@ board = Board()
 board.show()
 
 
-i = 1
-while True:
-    n = int(input())
-    if n == 1:
-        try:
-            color = 'white' if i % 2 else 'black'
-            if board.white_capture_throne(color):
-                print('White won')
-                break
-            if board.black_capture_throne(color):
-                print('Black won')
-                break
-            if board.statement(color):
-                print('Stalemate')
-                break
-            x1, y1, x2, y2 = (i for i in input())
-            res = board.make_a_move(x1, y1, x2, y2, color)
-            if res == 1:
-                i += 1
-        except:
-            print('Error')
-    elif n == 2:
-        #try:
-            x1, y1 = (i for i in input())
-            print(board.available_move(transform_x[x1], transform_y[y1], for_user=True))
-            print(1 + 1)
-        # except:
-        #     print('Error')
-    elif n == 3:
-        try:
-            x1, y1 = (i for i in input())
-            print(board.is_under_attack(transform_x[x1], transform_y[y1]))
-        except:
-            print('Error')
-    elif n == 4:
-        print('White' if i % 2 else 'Black')
-    elif n == 5:
-        print('Draw')
-        break
-    elif n == 6:
-        try:
-            x1, y1 = (i for i in input())
-            print(board.is_under_control(transform_x[x1], transform_y[y1], 'white'))
-            print(board.is_under_control(transform_x[x1], transform_y[y1], 'black'))
-        except:
-            print('Error')
-    board.show()
+# i = 1
+# while True:
+#     n = int(input())
+#     if n == 1:
+#         try:
+#             color = 'white' if i % 2 else 'black'
+#             if board.white_capture_throne(color):
+#                 print('White won')
+#                 break
+#             if board.black_capture_throne(color):
+#                 print('Black won')
+#                 break
+#             if board.statement(color):
+#                 print('Stalemate')
+#                 break
+#             x1, y1, x2, y2 = (i for i in input())
+#             res = board.make_a_move(x1, y1, x2, y2, color)
+#             if res == 1:
+#                 i += 1
+#         except:
+#             print('Error')
+#     elif n == 2:
+#         #try:
+#             x1, y1 = (i for i in input())
+#             print(board.available_move(transform_x[x1], transform_y[y1], for_user=True))
+#             print(1 + 1)
+#         # except:
+#         #     print('Error')
+#     elif n == 3:
+#         try:
+#             x1, y1 = (i for i in input())
+#             print(board.is_under_attack(transform_x[x1], transform_y[y1]))
+#         except:
+#             print('Error')
+#     elif n == 4:
+#         print('White' if i % 2 else 'Black')
+#     elif n == 5:
+#         print('Draw')
+#         break
+#     elif n == 6:
+#         try:
+#             x1, y1 = (i for i in input())
+#             print(board.is_under_control(transform_x[x1], transform_y[y1], 'white'))
+#             print(board.is_under_control(transform_x[x1], transform_y[y1], 'black'))
+#         except:
+#             print('Error')
+#     board.show()
 
 

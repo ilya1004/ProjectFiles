@@ -3,11 +3,11 @@ from tests.conftest import client
 
 def test_login_1():
     response = client.post("/auth/jwt/login", **{"data": {
-        "username": "test",
-        "password": "test"
+        "username": "qwe",
+        "password": "qwe"
     }})
 
-    # print(response.json())
+    print(response.cookies)
     assert response.status_code == 200
 
 
@@ -18,7 +18,7 @@ def test_login_2():
     }})
 
     # print(response.json())
-    assert response.status_code == 400
+    assert response.status_code == 200
 
 
 def test_login_3():

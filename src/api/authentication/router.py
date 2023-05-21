@@ -57,7 +57,8 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
             raise ExceptionUnauthorized("Error")
 
         lst = ["id", "nickname", "registration_time", "number_matches_blitz", "number_matches_rapid",
-               "number_matches_classical", "rate_blitz", "rate_rapid", "rate_classical"]
+               "number_matches_classical", "rate_blitz", "rate_rapid", "rate_classical",
+               "winrate_blitz", "winrate_rapid", "winrate_classical"]
         dict_res = dict()
         dict_res[lst[0]] = curr_user.id
         dict_res[lst[1]] = curr_user.nickname
@@ -68,6 +69,9 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
         dict_res[lst[6]] = curr_user.rate_blitz
         dict_res[lst[7]] = curr_user.rate_rapid
         dict_res[lst[8]] = curr_user.rate_classical
+        dict_res[lst[9]] = curr_user.winrate_blitz
+        dict_res[lst[10]] = curr_user.winrate_rapid
+        dict_res[lst[11]] = curr_user.winrate_classical
         return {
             "status": "success",
             "data": dict_res,
@@ -84,6 +88,34 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
             "status": "error",
             "data": "SQLAlchemyError",
             "details": f"Database error: {str(e)}"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "data": "Exception",
+            "details": str(e)
+        }
+
+
+@router.post("/change_curr_user_nickname")
+async def change_curr_user_nickname(new_nickname: str, curr_user: User = Depends(current_user),
+                                    session: AsyncSession = Depends(get_async_session)):
+    try:
+        if not isinstance(new_nickname, str):
+            raise TypeError("Nickname should be str")
+        update_query = user.update().where(user.c.id == curr_user.id).values(nickname=new_nickname)
+        await session.execute(update_query)
+        await session.commit()
+        return {
+            "status": "success",
+            "data": new_nickname,
+            "detail": None
+        }
+    except TypeError as e:
+        return {
+            "status": "error",
+            "data": "TypeError",
+            "details": str(e)
         }
     except Exception:
         return {
@@ -104,7 +136,8 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
         result = await session.execute(query)
         lst = ["id", "nickname", "registration_time",
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
-               "rate_blitz", "rate_rapid", "rate_classical"]
+               "rate_blitz", "rate_rapid", "rate_classical",
+               "winrate_blitz", "winrate_rapid", "winrate_classical"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         if len(list_res) == 0:
             raise ExceptionNoUser("Error")
@@ -154,7 +187,8 @@ async def get_info_of_all_users(session: AsyncSession = Depends(get_async_sessio
         result = await session.execute(query)
         lst = ["id", "nickname",
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
-               "rate_blitz", "rate_rapid", "rate_classical"]
+               "rate_blitz", "rate_rapid", "rate_classical",
+               "winrate_blitz", "winrate_rapid", "winrate_classical"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         if len(list_res) == 0:
             raise ExceptionNoUser("error")

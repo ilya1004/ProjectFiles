@@ -22,7 +22,10 @@ user = Table(
     Column('number_matches_classical', Integer, default=0, nullable=False),
     Column('rate_blitz', Integer, default=1000, nullable=False),
     Column('rate_rapid', Integer, default=1000, nullable=False),
-    Column('rate_classical', Integer, default=1000, nullable=False)
+    Column('rate_classical', Integer, default=1000, nullable=False),
+    Column('winrate_blitz', Integer, default=0, nullable=False),
+    Column('winrate_rapid', Integer, default=0, nullable=False),
+    Column('winrate_classical', Integer, default=0, nullable=False)
 )
 
 
@@ -41,3 +44,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     rate_blitz: int = Column(Integer, default=1000, nullable=False)
     rate_rapid: int = Column(Integer, default=1000, nullable=False)
     rate_classical: int = Column(Integer, default=1000, nullable=False)
+    winrate_blitz: int = Column(Integer, default=0, nullable=False)
+    winrate_rapid: int = Column(Integer, default=0, nullable=False)
+    winrate_classical: int = Column(Integer, default=0, nullable=False)

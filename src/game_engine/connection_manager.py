@@ -21,17 +21,17 @@ class ConnectionManager:
         self.queue_classical_unrate: list[list[Player], list[Player], list[Player]] = []
 
     def add_player_to_queue(self, player: Player):
-        if player.mode_id in (0, 1, 2):
+        if player.mode_id in (1, 2, 3):
             self.queue_blitz_rate[player.mode_id].append(player)
-        elif player.mode_id in (3, 4, 5):
+        elif player.mode_id in (4, 5, 6):
             self.queue_rapid_rate[player.mode_id % 3].append(player)
-        elif player.mode_id in (6, 7, 8):
+        elif player.mode_id in (7, 8, 9):
             self.queue_classical_rate[player.mode_id % 3].append(player)
-        elif player.mode_id in (10, 11, 12):
+        elif player.mode_id in (11, 12, 13):
             self.queue_blitz_unrate[(player.mode_id - 1) % 3].append(player)
-        elif player.mode_id in (13, 14, 15):
+        elif player.mode_id in (14, 15, 16):
             self.queue_rapid_unrate[(player.mode_id - 1) % 3].append(player)
-        elif player.mode_id in (16, 17, 18):
+        elif player.mode_id in (17, 18, 19):
             self.queue_classical_unrate[(player.mode_id - 1) % 3].append(player)
 
     def add_game_to_list(self, game: Game):
@@ -46,8 +46,9 @@ class ConnectionManager:
         else:
             self.games_list_unrate[game] = False
 
-    async def find_new_game(self, mode_id: int) -> (Player, Player):
-        if mode_id in (0, 1, 2):
+    async def find_new_game(self, mode_id_db: int) -> (Player, Player):
+        if mode_id_db in (1, 2, 3):
+            mode_id = mode_id_db - 1
             if len(self.queue_blitz_rate[mode_id]) <= 1:
                 return None, None
             self.queue_blitz_rate[mode_id].sort(key=self.rate_compare_blitz)
@@ -59,8 +60,8 @@ class ConnectionManager:
                     await self.queue_blitz_rate[mode_id][i + 1].send_message(
                         f"You will play with player #{self.queue_blitz_rate[mode_id][i].player_id}")
                     return self.queue_blitz_rate[mode_id][i], self.queue_blitz_rate[mode_id][i + 1]
-        elif mode_id in (3, 4, 5):
-            mode_id %= 3
+        elif mode_id_db in (4, 5, 6):
+            mode_id = (mode_id_db - 1) % 3
             if len(self.queue_rapid_rate[mode_id]) <= 1:
                 return None, None
             self.queue_rapid_rate[mode_id].sort(key=self.rate_compare_rapid)
@@ -72,8 +73,8 @@ class ConnectionManager:
                     await self.queue_rapid_rate[mode_id][i + 1].send_message(
                         f"You will play with player #{self.queue_rapid_rate[mode_id][i].player_id}")
                     return self.queue_rapid_rate[mode_id][i], self.queue_rapid_rate[mode_id][i + 1]
-        elif mode_id in (6, 7, 8):
-            mode_id %= 3
+        elif mode_id_db in (7, 8, 9):
+            mode_id = (mode_id_db - 1) % 3
             if len(self.queue_classical_rate[mode_id]) <= 1:
                 return None, None
             self.queue_classical_rate[mode_id].sort(key=self.rate_compare_classical)
@@ -85,8 +86,8 @@ class ConnectionManager:
                     await self.queue_classical_rate[mode_id][i + 1].send_message(
                         f"You will play with player #{self.queue_classical_rate[mode_id][i].player_id}")
                     return self.queue_classical_rate[mode_id][i], self.queue_classical_rate[mode_id][i + 1]
-        elif mode_id in (10, 11, 12):
-            mode_id = (mode_id - 1) % 3
+        elif mode_id_db in (11, 12, 13):
+            mode_id = (mode_id_db - 2) % 3
             if len(self.queue_blitz_unrate[mode_id]) <= 1:
                 return None, None
             else:
@@ -95,8 +96,8 @@ class ConnectionManager:
                 await self.queue_blitz_unrate[mode_id][1].send_message(
                     f"You will play with player #{self.queue_blitz_unrate[mode_id][0].player_id}")
                 return self.queue_blitz_unrate[mode_id][0], self.queue_blitz_unrate[mode_id][1]
-        elif mode_id in (13, 14, 15):
-            mode_id = (mode_id - 1) % 3
+        elif mode_id_db in (14, 15, 16):
+            mode_id = (mode_id_db - 2) % 3
             if len(self.queue_rapid_unrate[mode_id]) <= 1:
                 return None, None
             else:
@@ -105,8 +106,8 @@ class ConnectionManager:
                 await self.queue_rapid_unrate[mode_id][1].send_message(
                     f"You will play with player #{self.queue_rapid_unrate[mode_id][0].player_id}")
                 return self.queue_rapid_unrate[mode_id][0], self.queue_rapid_unrate[mode_id][1]
-        elif mode_id in (16, 17, 18):
-            mode_id = (mode_id - 1) % 3
+        elif mode_id_db in (17, 18, 19):
+            mode_id = (mode_id_db - 2) % 3
             if len(self.queue_classical_unrate[mode_id]) <= 1:
                 return None, None
             else:
@@ -118,6 +119,7 @@ class ConnectionManager:
 
     async def connect_user(self, websocket: WebSocket):
         await websocket.accept()
+        await websocket.send_text("qwe")
         self.active_connections.append(websocket)
 
     async def disconnect_user(self, websocket: WebSocket):
@@ -126,18 +128,23 @@ class ConnectionManager:
             await websocket.close()
 
     def remove_player_from_queues(self, player: Player):
-        if player.mode_id in (0, 1, 2) and player in self.queue_blitz_rate[player.mode_id]:
-            self.queue_blitz_rate[player.mode_id].remove(player)
-        elif player.mode_id in (3, 4, 5) and player in self.queue_rapid_rate[player.mode_id % 3]:
-            self.queue_rapid_rate[player.mode_id % 3].remove(player)
-        elif player.mode_id in (6, 7, 8) and player in self.queue_classical_rate[player.mode_id % 3]:
-            self.queue_rapid_rate[player.mode_id % 3].remove(player)
-        elif player.mode_id in (10, 11, 12) and player in self.queue_blitz_unrate[(player.mode_id - 1) % 3]:
-            self.queue_blitz_unrate[(player.mode_id - 1) % 3].remove(player)
-        elif player.mode_id in (13, 14, 15) and player in self.queue_rapid_unrate[(player.mode_id - 1) % 3]:
-            self.queue_rapid_unrate[(player.mode_id - 1) % 3].remove(player)
-        elif player.mode_id in (16, 17, 18) and player in self.queue_classical_unrate[(player.mode_id - 1) % 3]:
-            self.queue_rapid_unrate[(player.mode_id - 1) % 3].remove(player)
+        if player.mode_id in (1, 2, 3) and player in self.queue_blitz_rate[player.mode_id - 1]:
+            self.queue_blitz_rate[player.mode_id - 1].remove(player)
+
+        elif player.mode_id in (4, 5, 6) and player in self.queue_rapid_rate[(player.mode_id - 1) % 3]:
+            self.queue_rapid_rate[(player.mode_id - 1) % 3].remove(player)
+
+        elif player.mode_id in (7, 8, 9) and player in self.queue_classical_rate[(player.mode_id - 1) % 3]:
+            self.queue_rapid_rate[(player.mode_id - 1) % 3].remove(player)
+
+        elif player.mode_id in (11, 12, 13) and player in self.queue_blitz_unrate[(player.mode_id - 2) % 3]:
+            self.queue_blitz_unrate[(player.mode_id - 2) % 3].remove(player)
+
+        elif player.mode_id in (14, 15, 16) and player in self.queue_rapid_unrate[(player.mode_id - 2) % 3]:
+            self.queue_rapid_unrate[(player.mode_id - 2) % 3].remove(player)
+
+        elif player.mode_id in (17, 18, 19) and player in self.queue_classical_unrate[(player.mode_id - 2) % 3]:
+            self.queue_rapid_unrate[(player.mode_id - 2) % 3].remove(player)
 
     def delete_game_from_list(self, game: Game):
         if game.is_rated:
@@ -193,25 +200,25 @@ class ConnectionManager:
         # изменение рейтинга победителя, рейтинга проигравшего
         base_change = 20
         coef_change = 0.2
-        if player_winner.mode_id in (0, 1, 2):
+        if player_winner.mode_id in (1, 2, 3):
             rate_change = int(base_change + coef_change*abs(player_winner.rate_blitz - player_loser.rate_blitz))
             return rate_change, -rate_change
-        elif player_winner.mode_id in (3, 4, 5):
+        elif player_winner.mode_id in (4, 5, 6):
             rate_change = int(base_change + coef_change*abs(player_winner.rate_rapid - player_loser.rate_rapid))
             return rate_change, -rate_change
-        elif player_winner.mode_id in (6, 7, 8):
+        elif player_winner.mode_id in (7, 8, 9):
             rate_change = int(base_change + coef_change*abs(player_winner.rate_blitz - player_loser.rate_blitz))
             return rate_change, -rate_change
 
     @staticmethod
     async def update_users_rate_in_db(mode_id: int, player_winner: Player, player_loser: Player,
                                       rate_change_winner: int, rate_change_loser: int):
-        if mode_id in (0, 1, 2):
+        if mode_id in (1, 2, 3):
             await update_user_rate(player_winner.player_id, mode_id, player_winner.rate_blitz, rate_change_winner)
             await update_user_rate(player_loser.player_id, mode_id, player_loser.rate_blitz, rate_change_loser)
-        elif mode_id in (3, 4, 5):
+        elif mode_id in (4, 5, 6):
             await update_user_rate(player_winner.player_id, mode_id, player_winner.rate_rapid, rate_change_winner)
             await update_user_rate(player_loser.player_id, mode_id, player_loser.rate_rapid, rate_change_loser)
-        elif mode_id in (6, 7, 8):
+        elif mode_id in (7, 8, 9):
             await update_user_rate(player_winner.player_id, mode_id, player_winner.rate_classical, rate_change_winner)
             await update_user_rate(player_loser.player_id, mode_id, player_loser.rate_classical, rate_change_loser)

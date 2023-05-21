@@ -26,18 +26,18 @@ async def update_user_rate(user_id: int, mode_id: int, curr_rate: int, rate_diff
             raise TypeError("Mode ID should be int")
         if not isinstance(curr_rate, int) or not isinstance(rate_diff, int):
             raise TypeError("Rate should be int")
-        if mode_id not in range(0, 9):
+        if mode_id not in range(1, 10):
             raise ValueError("Invalid mode id")
         is_user_in_db = await is_user_in_database_by_id(user_id, session)
         if is_user_in_db["data"] == 0:
             raise ExceptionNoUser("error")
         update_query = None
         new_rate = curr_rate + rate_diff
-        if mode_id in (0, 1, 2):
+        if mode_id in (1, 2, 3):
             update_query = user.update().where(user.c.id == user_id).values(rate_blitz=new_rate)
-        elif mode_id in (3, 4, 5):
+        elif mode_id in (4, 5, 6):
             update_query = user.update().where(user.c.id == user_id).values(rate_rapid=new_rate)
-        elif mode_id == (6, 7, 8):
+        elif mode_id == (7, 8, 9):
             update_query = user.update().where(user.c.id == user_id).values(rate_classical=new_rate)
 
         await session.execute(update_query)
@@ -45,7 +45,8 @@ async def update_user_rate(user_id: int, mode_id: int, curr_rate: int, rate_diff
 
         return {
             "status": "success",
-            "data": new_rate
+            "data": new_rate,
+            "details": None
         }
     except SQLAlchemyError as e:
         return {
@@ -79,6 +80,69 @@ async def update_user_rate(user_id: int, mode_id: int, curr_rate: int, rate_diff
         }
 
 
+@router.post("/update_number_matches")
+async def update_number_matches(user_id: int, mode_id: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        if not isinstance(user_id, int):
+            raise TypeError("User ID should be int")
+        if not isinstance(mode_id, int):
+            raise TypeError("Mode ID should be int")
+        if mode_id not in range(1, 20):
+            raise ValueError("Invalid mode id")
+        is_user_in_db = await is_user_in_database_by_id(user_id, session)
+        if is_user_in_db["data"] == 0:
+            raise ExceptionNoUser("error")
+        update_query = None
+        if mode_id in (1, 2, 3, 11, 12, 13):
+            update_query = user.update().where(user.c.id == user_id)\
+                .values(number_matches_blitz=user.c.number_matches_blitz + 1)
+        elif mode_id in (4, 5, 6, 14, 15, 16):
+            update_query = user.update().where(user.c.id == user_id) \
+                .values(number_matches_rapid=user.c.number_matches_rapid + 1)
+        elif mode_id == (7, 8, 9, 17, 18, 19):
+            update_query = user.update().where(user.c.id == user_id) \
+                .values(number_matches_classical=user.c.number_matches_classical + 1)
+
+        await session.execute(update_query)
+        await session.commit()
+
+        return {
+            "status": "success",
+            "data": user_id,
+            "details": None
+        }
+    except SQLAlchemyError as e:
+        return {
+            "status": "error",
+            "data": "SQLAlchemyError",
+            "details": f"Database error: {str(e)}"
+        }
+    except ExceptionNoUser:
+        return {
+            "status": "error",
+            "data": "ExceptionNoUser",
+            "details": "No user in database with given id"
+        }
+    except ValueError as e:
+        return {
+            "status": "error",
+            "data": "ValueError",
+            "details": str(e)
+        }
+    except TypeError as e:
+        return {
+            "status": "error",
+            "data": "TypeError",
+            "details": str(e)
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "data": "Exception",
+            "details": str(e)
+        }
+
+
 @router.post('/add_new_match')
 async def add_new_match(mode_id: int, played_at: datetime, game_length: int,
                         player_winner_nickname: str, player_loser_nickname: str,
@@ -96,7 +160,7 @@ async def add_new_match(mode_id: int, played_at: datetime, game_length: int,
             raise TypeError("Player ID should be int")
         if not isinstance(rate_change_winner, int) or not isinstance(rate_change_loser, int):
             raise TypeError("Rate_change should be int")
-        if mode_id not in range(0, 19):
+        if mode_id not in range(1, 20):
             raise ValueError("Mode ID should be in range(0, 19)")
         new_match = {
             "id": 0,
@@ -142,3 +206,4 @@ async def add_new_match(mode_id: int, played_at: datetime, game_length: int,
             "data": "Exception",
             "details": "Unknown error"
         }
+

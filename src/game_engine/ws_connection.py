@@ -8,23 +8,33 @@ from src.game_engine.player import Player
 
 
 router = APIRouter(
-    prefix="/game_engine",
-    tags=["Game"]
+    prefix="/game_engine_ws",
+    tags=["Game_ws"]
 )
 
 
 manager = ConnectionManager()
 
+'''
+blitz_rate = 1, 2, 3
+rapid_rate = 4, 5, 6
+classical_rate = 7, 8, 9
 
-@router.websocket("/add_to_queue_ws/{mode_id}")
-async def add_to_queue_ws(websocket: WebSocket, mode_id: int, user=Depends(current_user)):
+blitz_unrate = 11, 12, 13
+rapid_unrate = 14, 15, 16
+classical_unrate = 17, 18, 19
+'''
+
+
+@router.websocket("/ws/{mode_id}/{user_id}")
+async def add_to_queue_ws(websocket: WebSocket, mode_id: int, user_id: int):
     try:
         if not isinstance(mode_id, int):
             raise TypeError("Mode ID should be int")
-        if mode_id not in range(0, 19):
-            raise ValueError("Mode ID should be in range(0, 19)")
+        if mode_id not in range(1, 20):
+            raise ValueError("Mode ID should be in range(1, 20)")
 
-        if mode_id in range(0, 8):
+        if mode_id in range(1, 10):
             is_rate = True
         else:
             is_rate = False
