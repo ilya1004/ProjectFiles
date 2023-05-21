@@ -119,7 +119,6 @@ class ConnectionManager:
 
     async def connect_user(self, websocket: WebSocket):
         await websocket.accept()
-        await websocket.send_text("qwe")
         self.active_connections.append(websocket)
 
     async def disconnect_user(self, websocket: WebSocket):

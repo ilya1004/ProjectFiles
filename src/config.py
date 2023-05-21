@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from fastapi import FastAPI
 
 load_dotenv()
 
@@ -16,3 +17,4 @@ DB_USER_TEST = os.environ.get('DB_USER_TEST')
 DB_PASS_TEST = os.environ.get('DB_PASS_TEST')
 
 SECRET_AUTH = os.environ.get('SECRET_AUTH')
+
