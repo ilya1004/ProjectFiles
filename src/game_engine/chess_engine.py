@@ -2,9 +2,7 @@ from datetime import datetime
 from src.game_engine.player import Player
 
 
-# тут будет логика игры в шахматы которую написал Захар
-
-
+'''
 class Game:
     def __init__(self, player1: Player, player2: Player, mode_id: int, time_start: datetime, is_rated: bool):
         self.player1 = player1
@@ -32,6 +30,7 @@ class Game:
     def get_id_player_to_move(self):
         # Вовзращает 1 или 2 в зависимости от того, чей ход (1го игрока или 2го)
         pass
+'''
 
 
 def illegal_move() -> None:
@@ -46,7 +45,7 @@ def incorrect_color() -> None:
     print('It\'s not your piece')
 
 
-class Board:
+class Game:
     class Figure:
 
         def __init__(self, color):
@@ -646,44 +645,46 @@ transform_x = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7, '
 transform_y = {'1': 8, '2': 7, '3': 6, '4': 5, '5': 4, '6': 3, '7': 2, '8': 1, '9': 0}
 transform_back_x = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h', 8: 'i'}
 transform_back_y = {8: '1', 7: '2', 6: '3', 5: '4', 4: '5', 3: '6', 2: '7', 1: '8', 0: '9'}
-transform_white_pawn = {'r': Board.Rook('white'), 'b': Board.Bishop('white'), 'n': Board.Knight('white'),
-                        'a': Board.Prince('white'), 'q': Board.Queen('white')}
-transform_black_pawn = {'R': Board.Rook('black'), 'B': Board.Bishop('black'), 'N': Board.Knight('black'),
-                        'A': Board.Prince('black'), 'Q': Board.Queen('black')}
-
-board = Board()
-board.show()
+transform_white_pawn = {'r': Game.Rook('white'), 'b': Game.Bishop('white'), 'n': Game.Knight('white'),
+                        'a': Game.Prince('white'), 'q': Game.Queen('white')}
+transform_black_pawn = {'R': Game.Rook('black'), 'B': Game.Bishop('black'), 'N': Game.Knight('black'),
+                        'A': Game.Prince('black'), 'Q': Game.Queen('black')}
 
 
-while True:
-    n = int(input())
-    if n == 1:
-        if board.throne_is_captured('white'):
-            print('White captured the throne. White won')
-            break
-        if board.throne_is_captured('black'):
-            print('Black cpatured the throne. Black won')
-            break
-        if not board.king_is_alive('white'):
-            print('White king and prince are dead. Black won')
-            break
-        if not board.king_is_alive('black'):
-            print('Black king and prince are dead. White won')
-            break
-        if board.no_active_moves():
-            print('50 moves have passed without capturing any piece.')
-            break
-        x1, y1, x2, y2 = (i for i in input())
-        res = board.make_a_move(x1, y1, x2, y2)
-    elif n == 2:
-        x1, y1 = (i for i in input())
-        print(board.get_available_moves(transform_x[x1], transform_y[y1], for_user=True))
-    elif n == 4:
-        pass
-    elif n == 5:
-        print(board.board_condition())
+# board = Game()
+# board.show()
 
-    board.show()
+
+
+# while True:
+#     n = int(input())
+#     if n == 1:
+#         if board.throne_is_captured('white'):
+#             print('White captured the throne. White won')
+#             break
+#         if board.throne_is_captured('black'):
+#             print('Black cpatured the throne. Black won')
+#             break
+#         if not board.king_is_alive('white'):
+#             print('White king and prince are dead. Black won')
+#             break
+#         if not board.king_is_alive('black'):
+#             print('Black king and prince are dead. White won')
+#             break
+#         if board.no_active_moves():
+#             print('50 moves have passed without capturing any piece.')
+#             break
+#         x1, y1, x2, y2 = (i for i in input())
+#         res = board.make_a_move(x1, y1, x2, y2)
+#     elif n == 2:
+#         x1, y1 = (i for i in input())
+#         print(board.get_available_moves(transform_x[x1], transform_y[y1], for_user=True))
+#     elif n == 4:
+#         pass
+#     elif n == 5:
+#         print(board.board_condition())
+#
+#     board.show()
 
 
 
