@@ -16,6 +16,10 @@ export default class Pawn extends Piece {
   }
 
   isMovePossible(src, dest, isDestEnemyOccupied) {
+    const [x1, y1] = this.convertToXY(src);
+    const [x2, y2] = this.convertToXY(dest);
+    let legality = Math.abs(x2 - x1) + Math.abs(y2 - y1) < 3;
+    if (!legality) return false;
     if (this.player === 1) {
       if (
         (dest === src - 9 && !isDestEnemyOccupied) ||

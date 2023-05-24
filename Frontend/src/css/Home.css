@@ -1,0 +1,50 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.welcome-box {
+    align-self: center;
+    border: 2px solid lightsalmon;
+    border-radius: 2vh;
+    width: 80%;
+    padding: 5vh;
+    margin: 2vh;
+    text-align: center;
+}
+
+.introduction-box {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    
+}
+
+.board-container {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: white;
+    
+}
+
+.board-container img {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid lightsalmon;
+}
+
+.text-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 5vh 5vh 5vh 5vh;
+    text-align: center;
+    font-size: 20px;
+    border: 2px dashed lightsalmon;
+    border-radius: 2vh;
+    margin-left: 5vh;
+}

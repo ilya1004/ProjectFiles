@@ -1,0 +1,53 @@
+.game-statistics {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 3vh;
+}
+
+
+.table-statistics-info-m {
+    text-align: center;
+    padding: 1vh 1vh 1vh;
+    margin: 0 0 5vh 15vh;
+    align-self: center;
+    height: 100px;
+    overflow: scroll;
+    /*background-color: blue;*/
+}
+
+.table-statistics-info-u {
+    text-align: center;
+    padding: 1vh 1vh 1vh;
+    margin: 0 0 5vh 3vh;
+    align-self: center;
+    height: 100px;
+    overflow: scroll;
+    /*background-color: blue;*/
+}
+
+.matches_info {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.users_info {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.list-matches td {
+    max-height: 100px; /* Задайте желаемую максимальную высоту */
+    overflow: hidden; /* Скрыть содержимое, если оно превышает максимальную высоту */
+}
+
+.match {
+    text-align: center;
+}
+
+.user {
+    text-align: center;
+}

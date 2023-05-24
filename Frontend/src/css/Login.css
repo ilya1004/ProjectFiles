@@ -1,0 +1,66 @@
+
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 530px;
+    margin: 4vh auto;
+    /*border: 1px solid #ccc;*/
+    border-radius: 15px;
+    /*padding: 0px;*/
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 600px;
+    margin: 4vh auto;
+    /*border: 1px solid #ccc;*/
+    border-radius: 15px;
+    /*padding: 0px;*/
+}
+
+.labels-form {
+    font-size: 19px;
+}
+
+
+.group-form {
+    margin-bottom: 3vh;
+}
+
+.card-form-l {
+    /*border: 0px solid ;*/
+    /*background-color: blue;*/
+    padding: 1vh;
+    height: 48vh;
+    border-radius: 15px;
+}
+
+.card-form-s {
+    /*border: 0px solid ;*/
+    /*background-color: blue;*/
+    padding: 1vh;
+    height: 80vh;
+    border-radius: 15px;
+}
+
+.card-form .button-form {
+    margin-top: 2vh;
+    padding: 1vh 3vh 5vh 3vh;
+    width: 100%;
+    height: 6vh;
+    border-radius: 20px;
+    font-size: 22px;
+    text-align: center;
+    /*margin-bottom: 3vh;*/
+}
+
+.card-form-s .group-form {
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+}

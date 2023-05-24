@@ -6,7 +6,10 @@ export default class Bishop extends Piece {
   }
 
   isMovePossible(src, dest){
-    return (Math.abs(src - dest) % 10 === 0 || Math.abs(src - dest) % 8 === 0);
+    const [x1, y1] = this.convertToXY(src);
+    const [x2, y2] = this.convertToXY(dest);
+    let legality = Math.abs(x2 - x1) == Math.abs(y2 - y1);
+    return (Math.abs(src - dest) % 10 === 0 || Math.abs(src - dest) % 8 === 0) && legality;
   }
 
   getSrcToDestPath(src, dest){
@@ -31,6 +34,7 @@ export default class Bishop extends Piece {
     for(let i = pathStart; i < pathEnd; i+=incrementBy){
       path.push(i);
     }
+    console.log(path);
     return path;
   }
 }

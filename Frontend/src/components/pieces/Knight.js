@@ -6,6 +6,10 @@ export default class Knight extends Piece {
   }
 
   isMovePossible(src, dest){
+    const [x1, y1] = this.convertToXY(src);
+    const [x2, y2] = this.convertToXY(dest);
+    let legality = Math.abs(x2 - x1) + Math.abs(y2 - y1) < 4; 
+
     return (src - 19 === dest || 
       src - 11 === dest || 
       src + 7 === dest || 
@@ -13,7 +17,8 @@ export default class Knight extends Piece {
       src - 17 === dest || 
       src - 7 === dest || 
       src + 11 === dest || 
-      src + 19 === dest);
+      src + 19 === dest) &&
+      legality;
   }
 
   /**

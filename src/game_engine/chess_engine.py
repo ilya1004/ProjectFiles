@@ -538,17 +538,24 @@ class Game:
             return self.player1
         return None
 
-    # это вместо json
-    def board_condition(self) -> str:
-        s = ''
+    def get_state(self) -> dict:
+        str_game = ''
         for line in self.board:
             for figure in line:
-                s += figure.__str__()
-        return s
+                str_game += figure.__str__()
+        return {
+            "status": "success",
+            "data": str_game,
+            "details": "game_is_starting"
+        }
 
     # Вовзращает 1 или 2 в зависимости от того, чей ход (1го игрока или 2го)
-    def get_id_player_to_move(self):
-        return 1 if self._move_number % 2 else 2 
+    async def get_id_player_to_move(self):
+        if self._move_number % 2:
+            return 1
+        else:
+            return 2
+
 
     def make_a_move(self, x1, y1, x2, y2) -> int:
 

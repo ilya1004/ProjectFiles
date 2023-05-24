@@ -1,0 +1,125 @@
+* {
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 3em;
+    background-color: lightgray;
+}
+
+h1, h2{
+    color:#333333;
+}
+
+.card{
+    background-color: aliceblue;
+    border-radius: 3px;
+    width: 15rem;
+    padding: 1rem;
+    box-shadow: 0 1px 4px #333333;
+
+}
+
+.modal {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    background-color: white;
+    padding: 1rem;
+    text-align: center;
+    width: 30rem;
+    z-index: 10;
+    position: fixed;
+    top: 20vh;
+    left: calc(50% - 15rem);
+}
+
+.backdrop {
+    position: fixed;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.75);
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+}
+
+.page-header {
+    background-color: antiquewhite;
+    padding: 1vh;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-bar li {
+    margin: 10px 1px 10px 1px;
+    /*border-right: 2px solid cornflowerblue;*/
+    width: 20vh;
+    padding: 0 10px;
+    /*background-color: ;*/
+    list-style: none;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.nav-bar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.nav-bar a:hover {
+    text-decoration: none;
+    color: #333;
+}
+
+.nav-bar li:hover {
+    background-color: wheat;
+}
+
+.logo {
+    align-self: center;
+    margin-left: 2vh;
+}
+
+.logo-img {
+    /*width: 90px;*/
+    width: 11vh;
+    border-radius: 15px;
+}
+
+.nav-bar {
+    margin: auto;
+}
+
+.nav-bar li {
+    color: white;
+    padding: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1.2rem;
+    display: inline-block;
+}
+
+.Link {
+    text-decoration: none;
+    color:#333333;
+    align-items: center;
+}
+
+.header-right {
+    align-self: center;
+}
+
+.header-right Button {
+    background-color: rgb(148, 117, 70);
+    outline: none;
+    box-shadow: none;
+    border-width: 0;
+}
+
+.header-right Button:focus{
+    outline: none;
+    box-shadow: none;
+}
+

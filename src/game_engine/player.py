@@ -16,6 +16,9 @@ class Player:
     async def send_game_state(self, game: dict):
         await self.websocket.send_json(game)
 
+    async def send_json(self, data: dict):
+        await self.websocket.send_json(data)
+
     async def send_message(self, message: str):
         await self.websocket.send_text(message)
 

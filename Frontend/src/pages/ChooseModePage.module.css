@@ -1,0 +1,32 @@
+
+.page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cont{
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 60%;
+}
+
+.head {
+    margin: 5vh;
+    text-align: center;
+}
+
+.row{
+    display: flex;
+    justify-content: center;
+    padding: 3vh;
+}
+
+.row Button{
+    margin: auto;
+    padding: 2vh;
+    width: 20vh;
+    border: none;
+}

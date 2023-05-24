@@ -162,8 +162,10 @@ async def get_all_matches(number_of_matches: int = -1, offset: int = 0,
         else:
             query = select(match).order_by(match.c.id.desc()).offset(offset).limit(number_of_matches)
         result = await session.execute(query)
-        lst = ["id", "mode_id", "played_at", "game_length_sec", "player_1_nickname", "player_2_nickname",
-               "player_1_id", "player_2_id", "rate_change_1", "rate_change_2"]
+        lst = ["id", "mode_id", "played_at", "game_length_sec",
+               "player_1_id", "player_2_id",
+               "player_1_nickname", "player_2_nickname",
+               "rate_change_1", "rate_change_2"]
         list_res = [dict(zip(lst, row)) for row in result.all()]
         return {
             "status": "success",

@@ -1,0 +1,25 @@
+.rules h2 {
+    align-items: center;
+    text-align: center;
+    margin-top: 4vh;
+}
+
+.rules-block {
+    margin: 3vh 5vh 2vh 5vh;
+    background-color: ivory;
+    border: 1px solid;
+    border-color: burlywood;
+    border-radius: 20px;
+    padding: 2vh;
+    /*color: ;*/
+}
+
+.rules h5 {
+    margin-top: 0;
+    margin-bottom: 1vh;
+    margin-left: 1vh;
+}
+
+.text-rules {
+    /*background-color: cornflowerblue;*/
+}

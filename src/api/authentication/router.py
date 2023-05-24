@@ -97,6 +97,35 @@ def get_info_of_current_user(curr_user: User = Depends(current_user)):
         }
 
 
+@router.get('/get_game_info_of_current_user')
+def get_game_info_of_current_user(curr_user: User = Depends(current_user)):
+    try:
+        if isinstance(curr_user, int) and curr_user == 401:
+            raise ExceptionUnauthorized("Error")
+
+        lst = ["id", "nickname", "average_rate"]
+        dict_res = dict()
+        dict_res[lst[0]] = curr_user.id
+        dict_res[lst[1]] = curr_user.nickname
+        dict_res[lst[2]] = (curr_user.rate_blitz + curr_user.rate_rapid + curr_user.rate_classical) // 3
+        return {
+            "status": "success",
+            "data": dict_res,
+            "details": None
+        }
+    except ExceptionUnauthorized:
+        return {
+            "status": "error",
+            "data": "ExceptionUnauthorized",
+            "details": "User is not authorized"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "data": "Exception",
+            "details": str(e)
+        }
+
 @router.post("/change_curr_user_nickname")
 async def change_curr_user_nickname(new_nickname: str, curr_user: User = Depends(current_user),
                                     session: AsyncSession = Depends(get_async_session)):
@@ -132,7 +161,8 @@ async def get_info_by_user_id(user_id: int, session: AsyncSession = Depends(get_
             raise TypeError("Error")
         query = select(user.c.id, user.c.nickname, user.c.registration_time,
                        user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
-                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical).where(user.c.id == user_id)
+                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical,
+                       user.c.winrate_blitz, user.c.winrate_rapid, user.c.winrate_classical).where(user.c.id == user_id)
         result = await session.execute(query)
         lst = ["id", "nickname", "registration_time",
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",
@@ -183,7 +213,8 @@ async def get_info_of_all_users(session: AsyncSession = Depends(get_async_sessio
     try:
         query = select(user.c.id, user.c.nickname,
                        user.c.number_matches_blitz, user.c.number_matches_rapid, user.c.number_matches_classical,
-                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical)
+                       user.c.rate_blitz, user.c.rate_rapid, user.c.rate_classical, user.c.winrate_blitz,
+                       user.c.winrate_rapid, user.c.winrate_classical)
         result = await session.execute(query)
         lst = ["id", "nickname",
                "number_matches_blitz", "number_matches_rapid", "number_matches_classical",

@@ -1,0 +1,99 @@
+.game {
+    padding: 2vh;
+}
+
+/*.game-board {*/
+/*    margin-left: 10vh;*/
+/*}*/
+
+.avanickrate {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 60vh;
+    height: 8vh;
+    border-width: 2px;
+    border-color: salmon;
+    border-style: solid;
+}
+
+.avanickrate div {
+    align-self: center;
+    margin: auto;
+}
+
+.gamepage {
+    flex: 1;
+    display: flex;
+}
+
+.game_info{
+    flex: 1;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 85vh;
+}
+
+.game_info h2 {
+    text-align: center;
+    margin: 5vh;
+    height: 4vh;
+}
+
+.turntimebox {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 50%;
+}
+
+.turntimebox h3 {
+    margin: auto;
+    align-self: flex-start;
+    text-align: center;
+}
+
+.turntimebox div {
+    margin: auto;
+    align-self: flex-start;
+}
+
+.timer {
+    text-align: center;
+    width: 22vh;
+    height: 10vh;
+    /*margin: auto;*/
+    /*margin-bottom: 10vh;*/
+    border-style: solid;
+    border-width: 2px;
+    border-color: salmon;
+    align-self:flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tablewrapper {
+    height: 80%;
+    overflow: auto;
+    margin: 3vh;
+}
+
+.movetable {
+    width: 80%;
+    height: 50vh;
+    overflow: auto;
+    text-align: center;
+    /*padding: 2vh 2vh 2vh 2vh;*/
+}
+
+.movetable tr {
+    width: 90%;
+}
+
+.movetable tr td {
+    border-style: solid;
+    border-color: salmon;
+    border-width: 2px;
+}
